@@ -9,15 +9,6 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
-
-        maven("https://maven.tryformation.com/releases") {
-            // optional but it speeds up the gradle dependency resolution
-            content {
-                includeGroup("com.jillesvangurp")
-                includeGroup("com.github.jillesvangurp")
-                includeGroup("com.tryformation")
-            }
-        }
 //        maven ("http://maven.google.com/")
     }
 }

@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.hideseekmapapp"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -57,5 +57,4 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.maps.mobile)
-    implementation(libs.overpass.kotlin.client)
 }

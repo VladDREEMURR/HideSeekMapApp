@@ -12,21 +12,31 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.hideseekmapapp.ui.theme.HideSeekMapAppTheme
+import com.yandex.mapkit.MapKitFactory
+import com.yandex.mapkit.mapview.MapView
 
 class MainActivity : ComponentActivity() {
+    private lateinit var mapView:MapView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            HideSeekMapAppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
-        }
+        MapKitFactory.setApiKey("60b6e681-e142-4dd6-8f98-73996515ab97")
+        MapKitFactory.initialize(this@MainActivity)
+        setContentView(R.layout.activity_main)
+
+        mapView = findViewById(R.id.map_view)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        MapKitFactory.getInstance().onStart()
+        mapView.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        MapKitFactory.getInstance().onStop()
+        mapView.onStop()
     }
 }
 
