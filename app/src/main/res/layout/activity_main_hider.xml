@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     >
 
-<!--  Карта  -->
+    <!--  Карта  -->
     <com.yandex.mapkit.mapview.MapView
         android:id="@+id/map_view"
         android:layout_width="match_parent"
@@ -13,11 +13,10 @@
         android:layout_weight="10"
         />
 
-<!--  Кнопки  -->
+    <!--  Кнопки  -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="50dp"
         android:orientation="horizontal"
         >
 
@@ -44,7 +43,7 @@
 
     </LinearLayout>
 
-<!--  Меню вопросов  -->
+    <!--  Меню вопросов  -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -66,7 +65,7 @@
 
     </LinearLayout>
 
-<!--  Меню настроек  -->
+    <!--  Меню настроек  -->
     <GridLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -76,7 +75,14 @@
         >
 
         <TextView
-            android:text="Режим Искателя"
+            android:text="Настройки"
+            />
+        <Button
+            android:text="\\/"
+            />
+
+        <TextView
+            android:text="Режим Жертвы"
             />
         <Button
             android:text="Переключить"
