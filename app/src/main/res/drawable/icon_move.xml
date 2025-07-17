@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:height="100dp"
+        android:width="100dp"
+        >
+
+        <vector
+            android:height="24dp"
+            android:viewportHeight="960"
+            android:viewportWidth="960"
+            android:width="24dp"
+            >
+
+            <path
+                android:fillColor="@color/black"
+                android:pathData="
+                M480,774
+                Q602,662 661,570.5
+                Q720,479 720,408
+                Q720,299 650.5,229.5
+                Q581,160 480,160
+                Q379,160 309.5,229.5
+                Q240,299 240,408
+                Q240,479 299,570.5
+                Q358,662 480,774
+                Z
+                M480,880
+                Q319,743 239.5,625.5
+                Q160,508 160,408
+                Q160,258 256.5,169
+                Q353,80 480,80
+                Q607,80 703.5,169
+                Q800,258 800,408
+                Q800,508 720.5,625.5
+                Q641,743 480,880
+                Z
+                M480,400
+                Q480,400 480,400
+                Q480,400 480,400
+                Q480,400 480,400
+                Q480,400 480,400
+                Q480,400 480,400
+                Q480,400 480,400
+                Q480,400 480,400
+                Q480,400 480,400
+                Z"/>
+
+        </vector>
+
+    </item>
+    <item
+        android:width="55dp"
+        android:height="55dp"
+        android:gravity="center_horizontal"
+        android:top="14dp"
+        >
+
+        <vector
+            android:height="24dp"
+            android:viewportHeight="960"
+            android:viewportWidth="960"
+            android:width="24dp"
+            >
+
+            <path
+                android:fillColor="@color/black"
+                android:pathData="
+                M480,880
+                Q397,880 324,848.5
+                Q251,817 197,763
+                Q143,709 111.5,636
+                Q80,563 80,480
+                L160,480
+                Q160,595 232.5,683
+                Q305,771 418,794
+                L360,736
+                L416,680
+                L598,862
+                Q569,872 539.5,876
+                Q510,880 480,880
+                Z
+                M800,480
+                Q800,365 727.5,277
+                Q655,189 542,166
+                L600,224
+                L544,280
+                L362,98
+                Q391,88 420.5,84
+                Q450,80 480,80
+                Q563,80 636,111.5
+                Q709,143 763,197
+                Q817,251 848.5,324
+                Q880,397 880,480
+                L800,480
+                Z"/>
+
+        </vector>
+
+    </item>
+</layer-list>

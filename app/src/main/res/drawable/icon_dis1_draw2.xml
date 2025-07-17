@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:top="40dp"
+        android:width="100dp"
+        android:height="100dp"
+        >
+
+        <vector
+            android:height="100dp"
+            android:viewportHeight="960"
+            android:viewportWidth="960"
+            android:width="100dp"
+            >
+
+            <path
+                android:fillColor="@color/black"
+                android:pathData="
+                M512,920
+                Q430,920 358,882.5
+                Q286,845 240,778
+                L48,496L67,477
+                Q87,456 116.5,453
+                Q146,450 170,467
+                L280,543L280,160
+                Q280,143 291.5,131.5
+                Q303,120 320,120
+                Q337,120 348.5,131.5
+                Q360,143 360,160
+                L360,697
+                L212,594
+                L307,732
+                Q342,783 396,811.5
+                Q450,840 512,840
+                Q615,840 687.5,767.5
+                Q760,695 760,592
+                L760,200
+                Q760,183 771.5,171.5
+                Q783,160 800,160
+                Q817,160 828.5,171.5
+                Q840,183 840,200
+                L840,592
+                Q840,729 744.5,824.5
+                Q649,920 512,920
+                Z
+                M440,480
+                L440,80
+                Q440,63 451.5,51.5
+                Q463,40 480,40
+                Q497,40 508.5,51.5
+                Q520,63 520,80
+                L520,480
+                L440,480
+                Z
+                M600,480
+                L600,120
+                Q600,103 611.5,91.5
+                Q623,80 640,80
+                Q657,80 668.5,91.5
+                Q680,103 680,120
+                L680,480
+                L600,480
+                Z
+                M486,660
+                Q486,660 486,660
+                Q486,660 486,660
+                Q486,660 486,660
+                Q486,660 486,660
+                L486,660L486,660
+                L486,660L486,660
+                Z"/>
+
+        </vector>
+
+    </item>
+
+    <item
+        android:height="20dp"
+        android:width="20dp"
+        android:top="95dp"
+        android:left="55dp"
+        >
+        <vector
+            android:height="100dp"
+            android:width="100dp"
+            android:viewportWidth="240"
+            android:viewportHeight="240"
+            >
+
+            <path
+                android:fillColor="@color/black"
+                android:pathData="
+                M120,240
+                L120,60
+                L60,60
+                L60,0
+                L180,0
+                L180,240
+                L180,240
+                Z"/>
+
+        </vector>
+    </item>
+
+    <item
+        android:width="20dp"
+        android:height="20dp"
+        android:top="95dp"
+        android:left="40dp"
+        >
+
+        <vector
+            android:height="100dp"
+            android:width="100dp"
+            android:viewportHeight="100"
+            android:viewportWidth="100"
+            >
+
+            <path
+                android:fillColor="@color/black"
+                android:pathData="
+                M10,40
+                L80,40
+                L80,60
+                L10,60
+                Z
+                "/>
+
+        </vector>
+
+    </item>
+
+    <item
+        android:width="40dp"
+        android:height="40dp"
+        android:gravity="center_horizontal"
+        >
+        <vector
+            android:height="100dp"
+            android:width="100dp"
+            android:viewportWidth="240"
+            android:viewportHeight="240"
+            >
+
+            <path
+                android:fillColor="@android:color/black"
+                android:pathData="
+                M30,240
+                L30,140
+                Q30,123 41.5,111.5
+                Q55,100 72,100
+                L150,100
+                L150,60
+                L30,60
+                L30,0
+                L170,0
+                Q187,0 198.5,11.5
+                Q210,23 210,40
+                L210,100
+                Q210,117 198.5,128.5
+                Q187,140 170,140
+                L90,140
+                L90,180
+                L210,180
+                L210,240
+                L30,240
+                Z"/>
+
+        </vector>
+    </item>
+
+</layer-list>
