@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+<!--  Бонусы  -->
     <string name="dis1_draw2">
         Сбрось 1 другую карту и возьми 2 карты.
     </string>
@@ -31,4 +32,175 @@
         В течение этого времени игра заморожена (т.е. прогресса в таймер не идёт и искатели не могут перемещаться и задавать вопросы).
         Эту карту нельзя сыграть, когда искатель находится в твоей зоне.
     </string>
+<!--  Проклятия  -->
+    <array name="curses">
+        <item name="bridge_troll">
+            <string name="name">Проклятие Мостового Тролля</string>
+            <string name="description">Следующий вопрос искатели должны задать из под моста.</string>
+            <string name="cost">Искатели должны быть как минимум в 8 км от тебя.</string>
+            <integer name="discards">0</integer>
+            <string name="discard_filter">all</string>
+        </item>
+        <item name="stone_tower">
+            <string name="name">Проклятие Каменной Башни</string>
+            <string name="description">У вас одна попытка положить друг на друга камни в устойчивом положении, каждый камень может упираться только на один другой камень. До добавления следующего камня башня должна простоять минимум 5 секунд. Если, в любой момент, любой камень, кроме самого нижнего, касается земли, башня считается павшей. Когда башня падает, скажите искателям количество камней в составе башни. Искатели не могут задавать вопросы, пока не построят башню (следуя тем же правилам) как минимум с тем же количеством камней. Когда башня падает, искатели должны попытаться заново. Камни должны быть найдены снаружи, после построения башни камни надо вернуть.</string>
+            <string name="cost">Построй каменную башню.</string>
+            <integer name="discards">0</integer>
+            <string name="discard_filter">all</string>
+        </item>
+        <item name="distant_cuisine">
+            <string name="name">Проклятие Далёкой Кухни</string>
+            <string name="description">Посети ресторан, находящийся в твоей зоне, у которого кухня из конкретной другой страны. Искатели должны посетить ресторан кухни страны той же или большей дистанции от страны кухни твоего ресторана.</string>
+            <string name="cost">Ты должен быть в ресторане.</string>
+            <integer name="discards">0</integer>
+            <string name="discard_filter">all</string>
+        </item>
+        <item name="drained_brain">
+            <string name="name">Проклятие Иссохшего Мозга</string>
+            <string name="description">Выбери 3 вопроса в разных категориях. До конца твоего забега искатели не могут задавать эти вопросы.</string>
+            <string name="cost">Сбрось все карты.</string>
+            <integer name="discards">-1</integer>
+            <string name="discard_filter">all</string>
+        </item>
+        <item name="egg_partner">
+            <string name="name">Проклятие Яичного Партнёра</string>
+            <string name="description">Искатели не могут задавать вопросы, пока не получат яйцо. Это яйцо считается сокомандником искателей. Если любой искатель брошен или убит (в случае яйца это появление трещин) до конца твоего забега, ты награждён дополнительными 45 минутами. Проклятие нельзя сыграть во время конечной игры.</string>
+            <string name="cost">Сбрось 2 карты.</string>
+            <integer name="discards">2</integer>
+            <string name="discard_filter">all</string>
+        </item>
+        <item name="endless_tumble">
+            <string name="name">Проклятие Безграничного Падения</string>
+            <string name="description">Искатели не могут задавать вопросы пока не бросят кубик как минимум на 30 метров одним броском, при этом на кубике должно выпасть 5 или 6. Кубик должен преодолеть дистанцию полностью, без чьей-либо помощи, используя только энергию броска и гравитацию. Если искатели в кого-то попадут броском кубика, ты награждён 20 минутами.</string>
+            <string name="cost">Брось кубик. Если на нём выпало 5 или 6, проклятие не возымеет эффекта.</string>
+            <integer name="discards">0</integer>
+            <string name="discard_filter">all</string>
+        </item>
+        <item name="gamblers_feet">
+            <string name="name">Проклятие Азартных Пяток</string>
+            <string name="description">В течение следующих 40 минут искатели должны бросить кубик перед тем, как делать шаги в любом направлении. Результат определяет количество шагов, которые могут сделать искатели, после чего они должны бросить кубик снова.</string>
+            <string name="cost">Брось кубик. Если на нём выпало чётное число, проклятие не возымеет эффекта.</string>
+            <integer name="discards">0</integer>
+            <string name="discard_filter">all</string>
+        </item>
+        <item name="hidden_hangman">
+            <string name="name">Проклятие Скрытого Висельника</string>
+            <string name="description">Перед тем, как задать следующий вопрос или воспользоваться каким-либо транспортом, искатели должны победить прячущегося в виселицу. Прячущийся загадывает слово из 5 букв. На каждую попытку угадать букву прячущийся должен отвечать в течение 30 секунд. Если искатели делают 7 неправильных попыток, новый раунд начинается через 10 минут. После успешного раунда или после 2-го проигрыша проклятие снимается.</string>
+            <string name="cost">Сбрось 2 карты.</string>
+            <integer name="discards">2</integer>
+            <string name="discard_filter">all</string>
+        </item>
+        <item name="impressionable_consumer">
+            <string name="name">Проклятие Впечатлительного Покупателя</string>
+            <string name="description">Искатели не могут задавать вопросы, пока не купят продукт с рекламы или пока не посетят место с рекламы. Реклама должна быть в окружающем мире и не должна быть в устройствах искателей. Покупка или место должны быть как минимум в 30 метрах от рекламы.</string>
+            <string name="cost">Следующий вопрос искателей бесплатный.</string>
+            <integer name="discards">0</integer>
+            <string name="discard_filter">all</string>
+        </item>
+        <item name="jammed_door">
+            <string name="name">Проклятие Запертой Двери</string>
+            <string name="description">В течении 1 часа, искатели должны бросить 2 кубика каждый раз, когда они должны войти в любой трансопорт, здание, бизнес. Если выпадает меньше 7, то они не смогут войти в это место. Попытаться заново можно только через 10 минут.</string>
+            <string name="cost">Сбрось 2 карты.</string>
+            <integer name="discards">2</integer>
+            <string name="discard_filter">all</string>
+        </item>
+        <item name="labyrinth">
+            <string name="name">Проклятие Лабиринта</string>
+            <string name="description">Потрать до 20 минут на прорисовку решаемого лабиринта и отправь фото этого лабиринта искателям. Относительно этого проклятия нельзя пользоваться интернетом. Искатели не могут задавать вопросы, пока не решат этот лабиринт.</string>
+            <string name="cost">Нарисуй лабиринт.</string>
+            <integer name="discards">0</integer>
+            <string name="discard_filter">all</string>
+        </item>
+        <item name="lemon_philactery">
+            <string name="name">Проклятие Лимонной Бактерии</string>
+            <string name="description">Искатели не могут задавать вопросы пока не найдут лимон, каждый искатель должен прикрепить лимон к внешнему слою своей кожи или ткани одежды. Если в любой момент твоего забега любого искателя не касается его лимон, ты награждаешься 45 минутами. Это проклятие не может быть сыграно в конечной игре.</string>
+            <string name="cost">Сбрось карту силы (рандомизация, вето, перемещение, сбросить-взять и так далее).</string>
+            <integer name="discards">1</integer>
+            <string name="discard_filter">powerup</string>
+        </item>
+        <item name="luxury_car">
+            <string name="name">Проклятие Дорогой Машины</string>
+            <string name="description">Сделай фотографию машины. Искатели не могут задавать вопросы, пока не сделают фотографию машины дороже.</string>
+            <string name="cost">Сделай фото машины.</string>
+            <integer name="discards">0</integer>
+            <string name="discard_filter">all</string>
+        </item>
+        <item name="mediocre_travel_agent">
+            <string name="name">Проклятие Посредственного Турагента</string>
+            <string name="description">Выбери любое публично доступное место в 100 метрах от текущего местоположения искателей. Они не могут быть в транспорте на данный момент. Они не могут задавать вопросы пока не проведут в этом месте как минимум 5 минут. Искатели должны прислать тебе как минимум 3 фотки с их наслаждением пребывания в этом месте, а также взять какую-нибудь вещь в качестве суневира. Если сувенир утерян до того, как искатели смогут отдать его тебе, ты награждён дополнительными 45 минутами.</string>
+            <string name="cost">Место отдыха искателей должно быть дальше, чем твоё текущее местоположение.</string>
+            <integer name="discards">0</integer>
+            <string name="discard_filter">all</string>
+        </item>
+        <item name="overflowing_chalice">
+            <string name="name">Проклятие Переполненной Чаши</string>
+            <string name="description">В течение следующих трёх вопросов ты можешь взять (не оставить) одну дополнительную карту, когда берёшь карты из колоды.</string>
+            <string name="cost">Сбрось карту.</string>
+            <integer name="discards">1</integer>
+            <string name="discard_filter">all</string>
+        </item>
+        <item name="ransom_note">
+            <string name="name">Проклятие Записки о Выкупе</string>
+            <string name="description">Следующий вопрос искателей должен быть составлен из слов и букв, вырезанных из любого напечатанного материала. Вопрос должен быть понятным и состоять из минимум 5 слов.</string>
+            <string name="cost">Произнеси "Записка о выкупе" как записку о выкупе.</string>
+            <integer name="discards">0</integer>
+            <string name="discard_filter">all</string>
+        </item>
+        <item name="right_turn">
+            <string name="name">Проклятие Правого Поворота</string>
+            <string name="description">В течение следующих 40 минут искатели могут поворачивать только направо на каждом пересечении улиц. Если в любой момент искатели окажутся в ситуации, где они не могут идти вперёд или повернуть направо в течение следующего километра, они могут развернуться на 180 градусов. Поворот направо определяется дорогой, которая под любым углом поворачивает направо относительно искателей.</string>
+            <string name="cost">Сбрось карту.</string>
+            <integer name="discards">1</integer>
+            <string name="discard_filter">all</string>
+        </item>
+        <item name="spotty_memory">
+            <string name="name">Проклятие Нечёткой Памяти</string>
+            <string name="description">Искатели случайно выбирают категорию вопросов, которая под запретом до конца твоего забега. Каждый раз, когда искатели задают вопрос, запретная категория меняется.</string>
+            <string name="cost">Сбрось карту с бонусом ко времени.</string>
+            <integer name="discards">1</integer>
+            <string name="discard_filter">time</string>
+        </item>
+        <item name="bird_guide">
+            <string name="name">Проклятие Птичника</string>
+            <string name="description">У тебя есть один шанс, чтобы запечатлеть птицу в видео как можно дольше, до 10 минут. Если в любой момент съёмки птица покидает кадр, таймер останавливается. Искатели не могут задавать вопросы, пока не снимут птицу в течение такого же времени или дольше по тем же правилам.</string>
+            <string name="cost">Сними птицу на видео.</string>
+            <integer name="discards">0</integer>
+            <string name="discard_filter">all</string>
+        </item>
+        <item name="lost_tourist">
+            <string name="name">Проклятие Заблудшего Туриста</string>
+            <string name="description">Отправь искателям скриншот изображения вида с улицы без приближения, показывающее место в 150 метрах от текущего местоположения искателей. Скриншот должен быть сделан параллельно горизонту и должен включать в себя хотя бы одну структуру, сделанную человеком (кроме дороги). Искатели не могут задавать вопросы или пользоваться транспортом пока, не используя интернет, не найдут то, что вы им прислали. Искатели должны прислать фото этого места как подтверждение.</string>
+            <string name="cost">Искатели должны быть на улице.</string>
+            <integer name="discards">0</integer>
+            <string name="discard_filter">all</string>
+        </item>
+        <item name="u_turn">
+            <string name="name">Проклятие Разворота</string>
+            <string name="description">Искатели должны покинуть текущий транспорт на следующей станции (которая посещается любым транспортом каждые 30 минут).</string>
+            <string name="cost">Искатели должны передвигаться не в ту сторону (их следующая станция должна быть дальше от твоего местоположения, чем их текущее местоположение).</string>
+            <integer name="discards">0</integer>
+            <string name="discard_filter">all</string>
+        </item>
+        <item name="urban_explorer">
+            <string name="name">Проклятие Городского Исследователя</string>
+            <string name="description">Искатели не могут задавать вопросы, находясь в транспорте или на остановке любого транспорта, до конца твоего забега.</string>
+            <string name="cost">Сбрось 2 карты.</string>
+            <integer name="discards">2</integer>
+            <string name="discard_filter">all</string>
+        </item>
+        <item name="water_weight">
+            <string name="name">Проклятие Тяжести Воды</string>
+            <string name="description">Искатели должны заполучить и носить с собой как минимум 2 литра жидкости на каждого искателя до конца твоего забега. Искатели не могут задавать вопросы, пока не получат жидкость. Жидкость может быть распределена между искателями так, как они хотят. Если жидкость оставлена или потеряна в любой момент после приобретения, прячущийся награждается дополнительными 30 минутами.</string>
+            <string name="cost">Искатели должны быть максимум в 150 метрах от любого вместилища воды, видимого на карте.</string>
+            <integer name="discards">0</integer>
+            <string name="discard_filter">all</string>
+        </item>
+        <item name="zoology">
+            <string name="name">Проклятие Зоолога</string>
+            <string name="description">Сделай фотографию любой рыбы, птицы, млекопитающего, рептилии, амфибии или жука. Искатели не могут задавать вопросы пока не отправят тебе фотографию животного из той же категории.</string>
+            <string name="cost">Фото животного.</string>
+            <integer name="discards">0</integer>
+            <string name="discard_filter">all</string>
+        </item>
+    </array>
 </resources>
