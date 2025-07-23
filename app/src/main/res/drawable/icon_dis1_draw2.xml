@@ -89,7 +89,7 @@
             >
 
             <path
-                android:fillColor="@color/black"
+                android:fillColor="@color/red_dark"
                 android:pathData="
                 M120,240
                 L120,60
@@ -118,7 +118,7 @@
             >
 
             <path
-                android:fillColor="@color/black"
+                android:fillColor="@color/red_dark"
                 android:pathData="
                 M10,40
                 L80,40
@@ -144,7 +144,7 @@
             >
 
             <path
-                android:fillColor="@android:color/black"
+                android:fillColor="@color/black"
                 android:pathData="
                 M30,240
                 L30,140

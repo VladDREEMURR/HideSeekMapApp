@@ -57,4 +57,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.maps.mobile)
+    implementation(libs.osmapi.overpass)
+    implementation(libs.voronoikotlin)
 }
