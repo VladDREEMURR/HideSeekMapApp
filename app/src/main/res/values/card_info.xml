@@ -1,37 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 <!--  Бонусы  -->
-    <string name="dis1_draw2">
-        Сбрось 1 другую карту и возьми 2 карты.
-    </string>
-    <string name="dis2_draw3">
-        Сбрось 2 другие карты и возьми 3 карты.
-    </string>
-    <string name="exp1_draw1">
-        Возьми 1 карту.
-        До конца забега размер руки увеличен на 1.
-    </string>
-    <string name="copy_card">
-        Выбери другую карту.
-        Теперь у тебя есть точная копия этой карты!
-        В конце забега можно использовать для копирования бонуса времени.
-    </string>
-    <string name="random">
-        Вместо ответа на заданный вопрос сыграй эту карту.
-        Искатель должен выбрать другой случайный незаданный вопрос в той же категории, на который ты должен ответить.
-        Ты получаешь награду за новый вопрос.
-    </string>
-    <string name="veto">
-        Вместо ответа на заданный вопрос сыграй эту карту.
-        Ты не отвечаешь на вопрос и не получаешь за него награду.
-        Вопрос считается заданным.
-    </string>
-    <string name="move">
-        Разыграв эту карту, пришли искателям место, в котором ты прятался.
-        У тебя есть 30 минут на то, чтобы переместиться на новое место.
-        В течение этого времени игра заморожена (т.е. прогресса в таймер не идёт и искатели не могут перемещаться и задавать вопросы).
-        Эту карту нельзя сыграть, когда искатель находится в твоей зоне.
-    </string>
+    <array name="powerups">
+        <item name="dis1_draw2">
+            <string name="description">
+                Сбрось 1 другую карту и возьми 2 карты.
+            </string>
+            <integer name="in_deck">4</integer>
+        </item>
+        <item name="dis2_draw3">
+            <string name="description">
+                Сбрось 2 другие карты и возьми 3 карты.
+            </string>
+            <integer name="in_deck">4</integer>
+        </item>
+        <item name="exp1_draw1">
+            <string name="description">
+                Возьми 1 карту.
+                До конца забега размер руки увеличен на 1.
+            </string>
+            <integer name="in_deck">2</integer>
+        </item>
+        <item name="copy_card">
+            <string name="description">
+                Выбери другую карту.
+                Теперь у тебя есть точная копия этой карты!
+                В конце забега можно использовать для копирования бонуса времени.
+            </string>
+            <integer name="in_deck">2</integer>
+        </item>
+        <item name="random">
+            <string name="description">
+                Вместо ответа на заданный вопрос сыграй эту карту.
+                Искатель должен выбрать другой случайный незаданный вопрос в той же категории, на который ты должен ответить.
+                Ты получаешь награду за новый вопрос.
+            </string>
+            <integer name="in_deck">4</integer>
+        </item>
+        <item name="veto">
+            <string name="description">
+                Вместо ответа на заданный вопрос сыграй эту карту.
+                Ты не отвечаешь на вопрос и не получаешь за него награду.
+                Вопрос считается заданным.
+            </string>
+            <integer name="in_deck">4</integer>
+        </item>
+        <item name="move">
+            <string name="description">
+                Разыграв эту карту, пришли искателям место, в котором ты прятался.
+                У тебя есть 30 минут на то, чтобы переместиться на новое место.
+                В течение этого времени игра заморожена (т.е. прогресса в таймер не идёт и искатели не могут перемещаться и задавать вопросы).
+                Эту карту нельзя сыграть, когда искатель находится в твоей зоне.
+            </string>
+            <integer name="in_deck">1</integer>
+        </item>
+    </array>
+<!--  Бонусы времени (указано только количество минут)  -->
+    <array name="time_bonuses">
+        <item name="little">
+            <integer name="minutes">3</integer>
+            <integer name="in_deck">25</integer>
+        </item>
+        <item name="small">
+            <integer name="minutes">6</integer>
+            <integer name="in_deck">15</integer>
+        </item>
+        <item name="medium">
+            <integer name="minutes">9</integer>
+            <integer name="in_deck">10</integer>
+        </item>
+        <item name="large">
+            <integer name="minutes">12</integer>
+            <integer name="in_deck">3</integer>
+        </item>
+        <item name="huge">
+            <integer name="minutes">18</integer>
+            <integer name="in_deck">2</integer>
+        </item>
+    </array>
 <!--  Проклятия  -->
     <array name="curses">
         <item name="bridge_troll">
@@ -42,6 +88,7 @@
             <string name="cost">Искатели должны быть как минимум в 8 км от тебя.</string>
             <integer name="discards">0</integer>
             <string name="discard_filter">all</string>
+            <integer name="in_deck">1</integer>
         </item>
         <item name="stone_tower">
             <string name="name">Проклятие Каменной Башни</string>
@@ -56,6 +103,7 @@
             <string name="cost">Построй каменную башню.</string>
             <integer name="discards">0</integer>
             <string name="discard_filter">all</string>
+            <integer name="in_deck">1</integer>
         </item>
         <item name="distant_cuisine">
             <string name="name">Проклятие Далёкой Кухни</string>
@@ -66,6 +114,7 @@
             <string name="cost">Ты должен быть в ресторане.</string>
             <integer name="discards">0</integer>
             <string name="discard_filter">all</string>
+            <integer name="in_deck">1</integer>
         </item>
         <item name="drained_brain">
             <string name="name">Проклятие Иссохшего Мозга</string>
@@ -75,6 +124,7 @@
             <string name="cost">Сбрось все карты.</string>
             <integer name="discards">-1</integer>
             <string name="discard_filter">all</string>
+            <integer name="in_deck">1</integer>
         </item>
         <item name="egg_partner">
             <string name="name">Проклятие Яичного Партнёра</string>
@@ -87,6 +137,7 @@
             <string name="cost">Сбрось 2 карты.</string>
             <integer name="discards">2</integer>
             <string name="discard_filter">all</string>
+            <integer name="in_deck">1</integer>
         </item>
         <item name="endless_tumble">
             <string name="name">Проклятие Безграничного Падения</string>
@@ -98,6 +149,7 @@
             <string name="cost">Брось кубик. Если на нём выпало 5 или 6, проклятие не возымеет эффекта.</string>
             <integer name="discards">0</integer>
             <string name="discard_filter">all</string>
+            <integer name="in_deck">1</integer>
         </item>
         <item name="gamblers_feet">
             <string name="name">Проклятие Азартных Пяток</string>
@@ -108,6 +160,7 @@
             <string name="cost">Брось кубик. Если на нём выпало чётное число, проклятие не возымеет эффекта.</string>
             <integer name="discards">0</integer>
             <string name="discard_filter">all</string>
+            <integer name="in_deck">1</integer>
         </item>
         <item name="hidden_hangman">
             <string name="name">Проклятие Скрытого Висельника</string>
@@ -120,6 +173,7 @@
             <string name="cost">Сбрось 2 карты.</string>
             <integer name="discards">2</integer>
             <string name="discard_filter">all</string>
+            <integer name="in_deck">1</integer>
         </item>
         <item name="impressionable_consumer">
             <string name="name">Проклятие Впечатлительного Покупателя</string>
@@ -131,6 +185,7 @@
             <string name="cost">Следующий вопрос искателей бесплатный.</string>
             <integer name="discards">0</integer>
             <string name="discard_filter">all</string>
+            <integer name="in_deck">1</integer>
         </item>
         <item name="jammed_door">
             <string name="name">Проклятие Запертой Двери</string>
@@ -142,6 +197,7 @@
             <string name="cost">Сбрось 2 карты.</string>
             <integer name="discards">2</integer>
             <string name="discard_filter">all</string>
+            <integer name="in_deck">1</integer>
         </item>
         <item name="labyrinth">
             <string name="name">Проклятие Лабиринта</string>
@@ -153,6 +209,7 @@
             <string name="cost">Нарисуй лабиринт.</string>
             <integer name="discards">0</integer>
             <string name="discard_filter">all</string>
+            <integer name="in_deck">1</integer>
         </item>
         <item name="lemon_philactery">
             <string name="name">Проклятие Лимонной Бактерии</string>
@@ -164,6 +221,7 @@
             <string name="cost">Сбрось карту силы (рандомизация, вето, перемещение, сбросить-взять и так далее).</string>
             <integer name="discards">1</integer>
             <string name="discard_filter">powerup</string>
+            <integer name="in_deck">1</integer>
         </item>
         <item name="luxury_car">
             <string name="name">Проклятие Дорогой Машины</string>
@@ -173,6 +231,7 @@
             <string name="cost">Сделай фото машины.</string>
             <integer name="discards">0</integer>
             <string name="discard_filter">all</string>
+            <integer name="in_deck">1</integer>
         </item>
         <item name="mediocre_travel_agent">
             <string name="name">Проклятие Посредственного Турагента</string>
@@ -185,6 +244,7 @@
             <string name="cost">Место отдыха искателей должно быть дальше, чем твоё текущее местоположение.</string>
             <integer name="discards">0</integer>
             <string name="discard_filter">all</string>
+            <integer name="in_deck">1</integer>
         </item>
         <item name="overflowing_chalice">
             <string name="name">Проклятие Переполненной Чаши</string>
@@ -194,6 +254,7 @@
             <string name="cost">Сбрось карту.</string>
             <integer name="discards">1</integer>
             <string name="discard_filter">all</string>
+            <integer name="in_deck">1</integer>
         </item>
         <item name="ransom_note">
             <string name="name">Проклятие Записки о Выкупе</string>
@@ -204,6 +265,7 @@
             <string name="cost">Произнеси "Записка о выкупе" как записку о выкупе.</string>
             <integer name="discards">0</integer>
             <string name="discard_filter">all</string>
+            <integer name="in_deck">1</integer>
         </item>
         <item name="right_turn">
             <string name="name">Проклятие Правого Поворота</string>
@@ -215,6 +277,7 @@
             <string name="cost">Сбрось карту.</string>
             <integer name="discards">1</integer>
             <string name="discard_filter">all</string>
+            <integer name="in_deck">1</integer>
         </item>
         <item name="spotty_memory">
             <string name="name">Проклятие Нечёткой Памяти</string>
@@ -225,6 +288,7 @@
             <string name="cost">Сбрось карту с бонусом ко времени.</string>
             <integer name="discards">1</integer>
             <string name="discard_filter">time</string>
+            <integer name="in_deck">1</integer>
         </item>
         <item name="bird_guide">
             <string name="name">Проклятие Птичника</string>
@@ -236,6 +300,7 @@
             <string name="cost">Сними птицу на видео.</string>
             <integer name="discards">0</integer>
             <string name="discard_filter">all</string>
+            <integer name="in_deck">1</integer>
         </item>
         <item name="lost_tourist">
             <string name="name">Проклятие Заблудшего Туриста</string>
@@ -248,6 +313,7 @@
             <string name="cost">Искатели должны быть на улице.</string>
             <integer name="discards">0</integer>
             <string name="discard_filter">all</string>
+            <integer name="in_deck">1</integer>
         </item>
         <item name="u_turn">
             <string name="name">Проклятие Разворота</string>
@@ -257,6 +323,7 @@
             <string name="cost">Искатели должны передвигаться не в ту сторону (их следующая станция должна быть дальше от твоего местоположения, чем их текущее местоположение).</string>
             <integer name="discards">0</integer>
             <string name="discard_filter">all</string>
+            <integer name="in_deck">1</integer>
         </item>
         <item name="urban_explorer">
             <string name="name">Проклятие Городского Исследователя</string>
@@ -266,6 +333,7 @@
             <string name="cost">Сбрось 2 карты.</string>
             <integer name="discards">2</integer>
             <string name="discard_filter">all</string>
+            <integer name="in_deck">1</integer>
         </item>
         <item name="water_weight">
             <string name="name">Проклятие Тяжести Воды</string>
@@ -277,6 +345,7 @@
             <string name="cost">Искатели должны быть максимум в 150 метрах от любого вместилища воды, видимого на карте.</string>
             <integer name="discards">0</integer>
             <string name="discard_filter">all</string>
+            <integer name="in_deck">1</integer>
         </item>
         <item name="zoology">
             <string name="name">Проклятие Зоолога</string>
@@ -287,6 +356,7 @@
             <string name="cost">Фото животного.</string>
             <integer name="discards">0</integer>
             <string name="discard_filter">all</string>
+            <integer name="in_deck">1</integer>
         </item>
     </array>
 </resources>

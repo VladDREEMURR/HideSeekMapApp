@@ -1,5 +1,6 @@
 [versions]
-agp = "8.11.0"
+agp = "8.11.1"
+annotationsJava5 = "24.1.0"
 geojson = "0.3.0"
 kotlin = "2.0.21"
 coreKtx = "1.16.0"
@@ -16,6 +17,7 @@ voronoikotlin = "v0.3.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+annotations-java5 = { module = "org.jetbrains:annotations-java5", version.ref = "annotationsJava5" }
 geojson = { module = "io.github.dellisd.spatialk:geojson", version.ref = "geojson" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

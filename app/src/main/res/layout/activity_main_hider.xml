@@ -39,8 +39,15 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Станции в зоне"
+            android:text="Карты"
             />
+
+<!--        <Button-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:layout_weight="1"-->
+<!--            android:text="Станции в зоне"-->
+<!--            />-->
 
     </LinearLayout>
 
@@ -67,28 +74,37 @@
     </LinearLayout>
 
     <!--  Меню настроек  -->
-    <GridLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0"
-        android:rowCount="5"
-        android:columnCount="2"
+        android:layout_weight="3"
         >
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:rowCount="5"
+            android:columnCount="2"
+            >
 
-        <TextView
-            android:text="Настройки"
-            />
-        <Button
-            android:text="\\/"
-            />
+            <TextView
+                android:text="Настройки"
+                />
+            <Button
+                android:text="\\/"
+                />
 
-        <TextView
-            android:text="Режим Жертвы"
-            />
-        <Button
-            android:text="Переключить"
-            />
+            <TextView
+                android:text="Режим Жертвы"
+                />
+            <Button
+                android:text="Переключить"
+                />
 
-    </GridLayout>
+            <TextView
+                android:id="@+id/something"
+                />
+
+        </GridLayout>
+    </ScrollView>
 
 </LinearLayout>

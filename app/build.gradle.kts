@@ -56,7 +56,11 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    // нужные библиотеки
     implementation(libs.maps.mobile)
-    implementation(libs.osmapi.overpass)
-    implementation(libs.voronoikotlin)
+//    implementation(libs.osmapi.overpass)
+//    implementation(libs.voronoikotlin)
+
+    // импортировано, чтобы ошибок не было
+//    implementation("org.jetbrains:annotations:18.0.0")
 }

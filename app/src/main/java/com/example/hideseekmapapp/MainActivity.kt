@@ -2,7 +2,11 @@ package com.example.hideseekmapapp
 
 
 
+import android.content.res.TypedArray
 import android.os.Bundle
+import android.util.Log
+import android.util.TypedValue
+import android.widget.TextView
 import androidx.activity.ComponentActivity
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.mapview.MapView
@@ -20,8 +24,20 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         MapKitFactory.setApiKey("60b6e681-e142-4dd6-8f98-73996515ab97")
         MapKitFactory.initialize(this@MainActivity)
-        setContentView(R.layout.activity_main_seeker)
+        setContentView(R.layout.activity_main_hider)
         mapView = findViewById(R.id.map_view)
+
+        val xmlarray : TypedArray = resources.obtainTypedArray(R.array.powerups)
+        var item : TypedValue
+        var i : Int = 0
+        var contains : String = ""
+        while (xmlarray.hasValue(i)) {
+            xmlarray.getValue(i, item)
+            
+        }
+        var displaytext : TextView = findViewById(R.id.something)
+        displaytext.setText(xmlarray.toString())
+        xmlarray.recycle()
     }
 
 
