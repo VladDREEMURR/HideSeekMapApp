@@ -1,4 +1,4 @@
-package com.example.hideseekmapapp.data
+package com.example.hideseekmapapp.deck
 
 
 

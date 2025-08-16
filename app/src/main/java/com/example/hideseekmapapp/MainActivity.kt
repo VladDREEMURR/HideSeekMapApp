@@ -26,18 +26,6 @@ class MainActivity : ComponentActivity() {
         MapKitFactory.initialize(this@MainActivity)
         setContentView(R.layout.activity_main_hider)
         mapView = findViewById(R.id.map_view)
-
-        val xmlarray : TypedArray = resources.obtainTypedArray(R.array.powerups)
-        var item : TypedValue
-        var i : Int = 0
-        var contains : String = ""
-        while (xmlarray.hasValue(i)) {
-            xmlarray.getValue(i, item)
-            
-        }
-        var displaytext : TextView = findViewById(R.id.something)
-        displaytext.setText(xmlarray.toString())
-        xmlarray.recycle()
     }
 
 

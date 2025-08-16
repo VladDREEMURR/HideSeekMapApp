@@ -58,9 +58,15 @@ dependencies {
 
     // нужные библиотеки
     implementation(libs.maps.mobile)
-//    implementation(libs.osmapi.overpass)
-//    implementation(libs.voronoikotlin)
+    implementation(libs.voronoikotlin)
+    implementation(libs.overpasser) // использовать в JAVA!!!!
+
+    implementation("com.mapbox.mapboxsdk:mapbox-sdk-geojson:7.7.0")
+    implementation("com.mapbox.mapboxsdk:mapbox-sdk-services:7.7.0")
+    implementation("com.mapbox.mapboxsdk:mapbox-sdk-turf:7.7.0")
+    implementation("com.mapbox.mapboxsdk:mapbox-sdk-core:7.7.0")
+
+    implementation("androidx.annotation:annotation:1.0.0")
 
     // импортировано, чтобы ошибок не было
-//    implementation("org.jetbrains:annotations:18.0.0")
 }
