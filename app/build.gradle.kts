@@ -57,16 +57,18 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     // нужные библиотеки
-    implementation(libs.maps.mobile)
-    implementation(libs.voronoikotlin)
-    implementation(libs.overpasser) // использовать в JAVA!!!!
+    implementation(libs.maps.mobile) // яндекс карты
 
+    implementation(libs.voronoikotlin) // полигоны вороного
+
+    implementation(libs.overpasser) // запросы в overpass (JAVA)
+
+    // адаптация некоторых функций turf (JAVA)
     implementation("com.mapbox.mapboxsdk:mapbox-sdk-geojson:7.7.0")
     implementation("com.mapbox.mapboxsdk:mapbox-sdk-services:7.7.0")
     implementation("com.mapbox.mapboxsdk:mapbox-sdk-turf:7.7.0")
     implementation("com.mapbox.mapboxsdk:mapbox-sdk-core:7.7.0")
-
     implementation("androidx.annotation:annotation:1.0.0")
 
-    // импортировано, чтобы ошибок не было
+    implementation("com.menecats:polybool-java:1.0.1") // булевые операции с областями (JAVA)
 }
