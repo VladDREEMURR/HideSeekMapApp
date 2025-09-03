@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.voronoikotlin) // полигоны вороного
 
     implementation(libs.overpasser) // запросы в overpass (JAVA)
+    implementation("hu.supercluster:overpasser-retrofit-adapter:0.2.2")
 
     // адаптация некоторых функций turf (JAVA)
     implementation("com.mapbox.mapboxsdk:mapbox-sdk-geojson:7.7.0")
