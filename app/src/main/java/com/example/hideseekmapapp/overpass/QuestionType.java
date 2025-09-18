@@ -1,4 +1,4 @@
-package com.example.hideseekmapapp.questions;
+package com.example.hideseekmapapp.overpass;
 
 public enum QuestionType {
     MATCH,

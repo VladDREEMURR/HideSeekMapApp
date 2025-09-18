@@ -37,6 +37,10 @@ android {
     buildFeatures {
         compose = true
     }
+    configurations {
+        implementation.get().exclude(mapOf("group" to "org.jetbrains", "module" to "annotations"))
+        implementation.get().exclude(mapOf("group" to "xmlpull", "module" to "xmlpull"))
+    }
 }
 
 dependencies {
@@ -61,11 +65,7 @@ dependencies {
 
     implementation(libs.voronoikotlin) // полигоны вороного
 
-    implementation(libs.overpasser) // запросы в overpass (JAVA)
-    implementation("hu.supercluster:overpasser-retrofit-adapter:0.2.2")
-
-    // geoDesk (замена всем этим overpass адаптерам?)
-    implementation("com.geodesk.geodesk:1.1.0")
+    implementation("de.westnordost:osmapi-overpass:3.0")
 
     // адаптация некоторых функций turf (JAVA)
     implementation("com.mapbox.mapboxsdk:mapbox-sdk-geojson:7.7.0")

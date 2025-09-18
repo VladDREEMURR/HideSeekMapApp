@@ -1,16 +1,11 @@
 package com.example.hideseekmapapp
 
 
-
-import android.content.res.TypedArray
 import android.os.Bundle
-import android.util.Log
-import android.util.TypedValue
-import android.widget.TextView
 import androidx.activity.ComponentActivity
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.mapview.MapView
-import com.example.hideseekmapapp.questions.OverpassProcessor
+import com.example.hideseekmapapp.overpass.OverpassProcessor
 
 
 class MainActivity : ComponentActivity() {
