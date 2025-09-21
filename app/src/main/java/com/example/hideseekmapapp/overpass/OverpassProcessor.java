@@ -1,10 +1,10 @@
 package com.example.hideseekmapapp.overpass;
 
-import android.util.Log;
-
-import de.westnordost.osmapi.OsmConnection;
-import de.westnordost.osmapi.overpass.ElementCount;
-import de.westnordost.osmapi.overpass.OverpassMapDataApi;
+import de.westnordost.osmapi.*;
+import de.westnordost.osmapi.common.*;
+import de.westnordost.osmapi.overpass.*;
+import de.westnordost.osmapi.map.data.*;
+import de.westnordost.osmapi.map.handler.*;
 
 
 public class OverpassProcessor {
@@ -18,6 +18,54 @@ public class OverpassProcessor {
     private static final String TAG = OverpassProcessor.class.getSimpleName();
 
 
+    private static final MapDataHandler mapdata_handler = new MapDataHandler() {
+        @Override
+        public void handle(BoundingBox bounds) {
+
+        }
+
+        @Override
+        public void handle(Node node) {
+
+        }
+
+        @Override
+        public void handle(Way way) {
+
+        }
+
+        @Override
+        public void handle(Relation relation) {
+
+        }
+    };
+
+
+    private static final MapDataHandler polygon_handler = new MapDataHandler() {
+        @Override
+        public void handle(BoundingBox bounds) {}
+
+        @Override
+        public void handle(Node node) {
+
+        }
+
+        @Override
+        public void handle(Way way) {}
+
+        @Override
+        public void handle(Relation relation) {}
+    };
+
+
+    Handler<String[]> table_handler = new Handler<String[]>() {
+        @Override
+        public void handle(String[] tea) {
+
+        }
+    };
+
+
     public void testOverpass() {
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -27,7 +75,17 @@ public class OverpassProcessor {
                 ElementCount count = overpass.queryCount(
                         "{{geocodeArea:Vienna}}->.searchArea; nwr[shop](area.searchArea); out count;"
                 );
-                Log.d(TAG, Long.toString(count.total));
+                overpass.queryElements("[out:json][timeout:25];\n" +
+                        "{{geocodeArea:Moscow}}->.searchArea;\n" +
+                        "(\n" +
+                        "  node[\"tourism\"=\"museum\"](area.searchArea);\n" +
+                        "  way[\"tourism\"=\"museum\"](area.searchArea);\n" +
+                        "  relation[\"tourism\"=\"museum\"](area.searchArea);\n" +
+                        ");\n" +
+                        "out body;\n" +
+                        ">;\n" +
+                        "out skel qt;", mapdata_handler);
+//                overpass.queryTable("ww", table_handler);
             }
         });
         thread.start();
