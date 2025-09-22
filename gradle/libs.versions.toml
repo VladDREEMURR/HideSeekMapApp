@@ -1,5 +1,5 @@
 [versions]
-agp = "8.12.3"
+agp = "8.13.0"
 annotationsJava5 = "24.1.0"
 geojson = "0.3.0"
 kotlin = "2.0.21"

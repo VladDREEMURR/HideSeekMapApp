@@ -1,4 +1,4 @@
 package com.example.hideseekmapapp.overpass;
 
-public class Tentacles extends Question {
+public class Tentacles implements Question {
 }

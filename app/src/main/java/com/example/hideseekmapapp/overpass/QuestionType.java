@@ -1,10 +1,9 @@
 package com.example.hideseekmapapp.overpass;
 
 public enum QuestionType {
-    MATCH,
-    COMPARE,
+    MATCHING,
+    MEASURING,
     THERMOMETER,
     RADAR,
-    TENTACLES,
-    PHOTO
+    TENTACLES
 }

@@ -1,4 +1,4 @@
 package com.example.hideseekmapapp.overpass;
 
-public class Radar extends Question {
+public class Radar implements Question {
 }
