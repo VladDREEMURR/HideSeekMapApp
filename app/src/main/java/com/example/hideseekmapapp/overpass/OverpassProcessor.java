@@ -1,5 +1,8 @@
 package com.example.hideseekmapapp.overpass;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import de.westnordost.osmapi.*;
 import de.westnordost.osmapi.common.*;
 import de.westnordost.osmapi.overpass.*;
@@ -21,31 +24,36 @@ public class OverpassProcessor {
 
     private static final String TAG = OverpassProcessor.class.getSimpleName();
 
+    private int boundings = 0;
+    private int nodes = 0;
+    private int ways = 0;
+    private int relations = 0;
 
-    private static final MapDataHandler mapdata_handler = new MapDataHandler() {
+
+    private final MapDataHandler mapdata_handler = new MapDataHandler() {
         @Override
         public void handle(BoundingBox bounds) {
-
+            boundings++;
         }
 
         @Override
         public void handle(Node node) {
-
+            nodes++;
         }
 
         @Override
         public void handle(Way way) {
-
+            ways++;
         }
 
         @Override
         public void handle(Relation relation) {
-
+            relations++;
         }
     };
 
 
-    private static final MapDataHandler polygon_handler = new MapDataHandler() {
+    private final MapDataHandler polygon_handler = new MapDataHandler() {
         @Override
         public void handle(BoundingBox bounds) {}
 
@@ -62,7 +70,7 @@ public class OverpassProcessor {
     };
 
 
-    Handler<String[]> table_handler = new Handler<String[]>() {
+    private final Handler<String[]> table_handler = new Handler<String[]>() {
         @Override
         public void handle(String[] tea) {
 
@@ -70,28 +78,46 @@ public class OverpassProcessor {
     };
 
 
-    public void testOverpass() {
+    public String testOverpass() {
+//        OsmConnection connection = new OsmConnection("https://maps.mail.ru/osm/tools/overpass/api/", "my user agent");
+//        OverpassMapDataApi overpass = new OverpassMapDataApi(connection);
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 OsmConnection connection = new OsmConnection("https://maps.mail.ru/osm/tools/overpass/api/", "my user agent");
                 OverpassMapDataApi overpass = new OverpassMapDataApi(connection);
-                ElementCount count = overpass.queryCount(
-                        "{{geocodeArea:Vienna}}->.searchArea; nwr[shop](area.searchArea); out count;"
-                );
-                overpass.queryElements("[out:json][timeout:25];\n" +
-                        "{{geocodeArea:Moscow}}->.searchArea;\n" +
-                        "(\n" +
-                        "  node[\"tourism\"=\"museum\"](area.searchArea);\n" +
-                        "  way[\"tourism\"=\"museum\"](area.searchArea);\n" +
-                        "  relation[\"tourism\"=\"museum\"](area.searchArea);\n" +
-                        ");\n" +
-                        "out body;\n" +
-                        ">;\n" +
-                        "out skel qt;", mapdata_handler);
-//                overpass.queryTable("ww", table_handler);
+                try {
+                    ElementCount count = overpass.queryCount(
+                            "{{geocodeArea:Vienna}}->.searchArea;\n" +
+                                    "nwr[shop](area.searchArea);\n" +
+                                    "out count;"
+                    );
+
+                } catch (Exception e) {
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    e.printStackTrace(pw);
+                    String s = sw.toString();
+                }
             }
         });
         thread.start();
+        /*try {
+            thread.join();
+        } catch (InterruptedException e) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            String s = sw.toString();
+        }*/
+        StringBuilder sb = new StringBuilder();
+        sb.append(boundings);
+        sb.append('\n');
+        sb.append(nodes);
+        sb.append('\n');
+        sb.append(ways);
+        sb.append('\n');
+        sb.append(relations);
+        return sb.toString();
     }
 }

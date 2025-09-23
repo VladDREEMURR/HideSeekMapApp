@@ -14,6 +14,14 @@
         android:layout_weight="10"
         />
 
+    <!--  Тестирующий вывод  -->
+    <TextView
+        android:id="@+id/test_output"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="10"
+        android:text="test is empty now"/>
+
 <!--  Кнопки для карты  -->
     <LinearLayout
         android:layout_width="match_parent"

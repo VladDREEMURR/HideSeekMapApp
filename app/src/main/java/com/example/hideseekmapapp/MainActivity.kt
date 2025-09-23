@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.GridLayout
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.activity.ComponentActivity
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.mapview.MapView
@@ -34,6 +35,9 @@ class MainActivity : ComponentActivity() {
     private var settings_shown : Boolean = false
 
     private var overpass_processor : OverpassProcessor = OverpassProcessor()
+
+    // для тестирования
+    private lateinit var test_output_block : TextView
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,8 +90,11 @@ class MainActivity : ComponentActivity() {
         // сделать какие-то функции перед запуском
         refresh_layout_weights()
 
+        // блок тестового вывода
+        test_output_block = findViewById(R.id.test_output)
+
         // some code
-//        overpass_processor.testOverpass()
+        test_output_block.text = overpass_processor.testOverpass()
     }
 
 
