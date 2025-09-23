@@ -12,14 +12,19 @@ import androidx.activity.ComponentActivity
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.mapview.MapView
 import com.example.hideseekmapapp.overpass.OverpassProcessor
+import com.yandex.mapkit.map.CameraPosition
 
-
+// TODO: сделать рабочей область вопросов и настроек (возможно, отребуются отдельные классы для управления этими категориями)
+// TODO: протестировать зарисовку областей на карте через OverpassProcessor
+// TODO: сделать overpass запрос в отдельных файлах для каждого вопроса
 
 class MainActivity : ComponentActivity() {
     // режим приложения
     private var mode : String = "seeker" // "seeker" или "hider"
 
     private lateinit var map_view : MapView
+    private lateinit var button_orientation_north : Button
+    private lateinit var button_zoom_area : Button
     private lateinit var button_questions : Button
     private lateinit var button_settings : Button
     private lateinit var layout_questions : LinearLayout
@@ -41,12 +46,24 @@ class MainActivity : ComponentActivity() {
         // получение элементов интерфейса
         setContentView(R.layout.activity_main)
         map_view = findViewById(R.id.map_view)
+        button_orientation_north = findViewById(R.id.north_orientation_button)
+        button_zoom_area = findViewById(R.id.zoom_area_button)
         button_questions = findViewById(R.id.toggle_questions_button)
         button_settings = findViewById(R.id.toggle_settings_button)
         layout_questions = findViewById(R.id.questions_layout)
         layout_settings = findViewById(R.id.settings_layout)
 
         // события клика на кнопки
+        button_orientation_north.setOnClickListener {
+            val current_map_position = map_view.map.cameraPosition.target
+            val current_zoom = map_view.map.cameraPosition.zoom
+            map_view.map.move(
+                CameraPosition(current_map_position, current_zoom, 0.0f, 0.0f)
+            )
+        }
+        button_zoom_area.setOnClickListener {
+            // TODO: сделать приближение/отдаление по оставшейся области пряток
+        }
         button_questions.setOnClickListener {
             if (questons_shown) {
                 questons_shown = false
@@ -66,9 +83,10 @@ class MainActivity : ComponentActivity() {
             refresh_layout_weights()
         }
 
+        // сделать какие-то функции перед запуском
         refresh_layout_weights()
 
-        // some bullshit code
+        // some code
 //        overpass_processor.testOverpass()
     }
 

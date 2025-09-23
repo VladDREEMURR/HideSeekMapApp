@@ -2,6 +2,8 @@ package com.example.hideseekmapapp.overpass;
 
 import java.util.ArrayList;
 
+// TODO: полная реализация Matching вопросов
+
 public class Matching implements Question {
     // главные данные вопроса
     public MatchingType matching_type; // какой именно вопрос совпадения мы задаём

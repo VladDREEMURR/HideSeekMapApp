@@ -1,5 +1,7 @@
 package com.example.hideseekmapapp.overpass;
 
+// TODO: полная реализация Radar вопросов
+
 public class Radar implements Question {
 
 

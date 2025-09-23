@@ -1,5 +1,7 @@
 package com.example.hideseekmapapp.overpass;
 
+// TODO: полная реализация Measuring вопросов
+
 public class Measuring implements Question {
 
 

@@ -1,5 +1,7 @@
 package com.example.hideseekmapapp.overpass;
 
+// TODO: полная реализация Thermometer вопросов
+
 public class Thermometer implements Question {
 
 

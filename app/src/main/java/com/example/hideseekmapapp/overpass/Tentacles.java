@@ -1,5 +1,7 @@
 package com.example.hideseekmapapp.overpass;
 
+// TODO: полная реализация Tentacles вопросов
+
 public class Tentacles implements Question {
 
 

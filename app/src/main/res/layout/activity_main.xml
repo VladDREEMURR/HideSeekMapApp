@@ -14,12 +14,38 @@
         android:layout_weight="10"
         />
 
-<!--  Кнопки  -->
+<!--  Кнопки для карты  -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:orientation="horizontal"
         android:background="@color/teal"
+        >
+
+        <Button
+            android:id="@+id/north_orientation_button"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Ориентация -> Север"
+            />
+
+        <Button
+            android:id="@+id/zoom_area_button"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Полный вид области (не работает)"
+            />
+
+    </LinearLayout>
+
+<!--  Кнопки интерфейса  -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:background="@color/red_dark"
         >
 
         <Button
@@ -72,18 +98,26 @@
         android:columnCount="2"
         >
 
+<!--
+Возможно, элементы ниже не нужны, надо подумать над настройками
+Можно включить:
+1) (для прячущихся) Включить автоматические ответы
+1.1) Координаты точки нахождения
+1.2) Скрыть точку нахождения (для того, чтобы на скриншоте не было видно)
+-->
+
         <TextView
             android:text="Настройки"
             />
         <Button
-            android:text="\\/"
+            android:text="\\/ (не работает)"
             />
 
         <TextView
             android:text="Режим Искателя"
             />
         <Button
-            android:text="Переключить"
+            android:text="Переключить (не работает)"
             />
 
     </GridLayout>
