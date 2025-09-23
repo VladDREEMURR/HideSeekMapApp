@@ -3,9 +3,10 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     >
 
-    <!--  Карта  -->
+<!--  Карта  -->
     <com.yandex.mapkit.mapview.MapView
         android:id="@+id/map_view"
         android:layout_width="match_parent"
@@ -13,7 +14,7 @@
         android:layout_weight="10"
         />
 
-    <!--  Кнопки  -->
+<!--  Кнопки  -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -22,6 +23,7 @@
         >
 
         <Button
+            android:id="@+id/toggle_questions_button"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -29,30 +31,18 @@
             />
 
         <Button
+            android:id="@+id/toggle_settings_button"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="Настройки"
             />
 
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="Карты"
-            />
-
-<!--        <Button-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:layout_weight="1"-->
-<!--            android:text="Станции в зоне"-->
-<!--            />-->
-
     </LinearLayout>
 
-    <!--  Меню вопросов  -->
+<!--  Меню вопросов  -->
     <LinearLayout
+        android:id="@+id/questions_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0"
@@ -73,38 +63,29 @@
 
     </LinearLayout>
 
-    <!--  Меню настроек  -->
-    <ScrollView
+<!--  Меню настроек  -->
+    <GridLayout
+        android:id="@+id/settings_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3"
+        android:rowCount="5"
+        android:columnCount="2"
         >
-        <GridLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:rowCount="5"
-            android:columnCount="2"
-            >
 
-            <TextView
-                android:text="Настройки"
-                />
-            <Button
-                android:text="\\/"
-                />
+        <TextView
+            android:text="Настройки"
+            />
+        <Button
+            android:text="\\/"
+            />
 
-            <TextView
-                android:text="Режим Жертвы"
-                />
-            <Button
-                android:text="Переключить"
-                />
+        <TextView
+            android:text="Режим Искателя"
+            />
+        <Button
+            android:text="Переключить"
+            />
 
-            <TextView
-                android:id="@+id/something"
-                />
-
-        </GridLayout>
-    </ScrollView>
+    </GridLayout>
 
 </LinearLayout>
