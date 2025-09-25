@@ -10,6 +10,7 @@ import de.westnordost.osmapi.map.data.*;
 import de.westnordost.osmapi.map.handler.*;
 
 import com.menecats.polybool.helpers.PolyBoolHelper;
+import com.menecats.polybool.models.geojson.Geometry;
 
 // TODO: протестировать обработку объектов (на примере точек музеев) (с отображением)
 // TODO: протестировать обработку объектов (на примере точек парков) (с отображением)
@@ -113,20 +114,20 @@ public class OverpassProcessor {
         );
         com.menecats.polybool.models.Polygon p2 = PolyBoolHelper.polygon(
                 PolyBoolHelper.region(
-                        PolyBoolHelper.point(1,2),
-                        PolyBoolHelper.point(1,4),
-                        PolyBoolHelper.point(3,4),
-                        PolyBoolHelper.point(3,2),
-                        PolyBoolHelper.point(1,2)
+                        PolyBoolHelper.point(2,2),
+                        PolyBoolHelper.point(2,4),
+                        PolyBoolHelper.point(4,4),
+                        PolyBoolHelper.point(4,2),
+                        PolyBoolHelper.point(2,2)
                 )
         );
         com.menecats.polybool.models.Polygon p3 = PolyBoolHelper.polygon(
                 PolyBoolHelper.region(
-                        PolyBoolHelper.point(3,1),
-                        PolyBoolHelper.point(3,3),
-                        PolyBoolHelper.point(6,3),
                         PolyBoolHelper.point(6,1),
-                        PolyBoolHelper.point(3,1)
+                        PolyBoolHelper.point(6,3),
+                        PolyBoolHelper.point(8,3),
+                        PolyBoolHelper.point(8,1),
+                        PolyBoolHelper.point(6,1)
                 )
         );
         com.menecats.polybool.models.Polygon res = com.menecats.polybool.PolyBool.difference(
@@ -134,7 +135,7 @@ public class OverpassProcessor {
                 p1,
                 p2
         );
-        res = com.menecats.polybool.PolyBool.difference(
+        res = com.menecats.polybool.PolyBool.union(
                 PolyBoolHelper.epsilon(),
                 res,
                 p3

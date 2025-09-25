@@ -47,48 +47,8 @@ class MainActivity : ComponentActivity() {
         MapKitFactory.setApiKey("60b6e681-e142-4dd6-8f98-73996515ab97")
         MapKitFactory.initialize(this@MainActivity)
 
-        // получение элементов интерфейса
-        setContentView(R.layout.activity_main)
-        map_view = findViewById(R.id.map_view)
-        button_orientation_north = findViewById(R.id.north_orientation_button)
-        button_zoom_area = findViewById(R.id.zoom_area_button)
-        button_questions = findViewById(R.id.toggle_questions_button)
-        button_settings = findViewById(R.id.toggle_settings_button)
-        layout_questions = findViewById(R.id.questions_layout)
-        layout_settings = findViewById(R.id.settings_layout)
-
-        // события клика на кнопки
-        button_orientation_north.setOnClickListener {
-            val current_map_position = map_view.map.cameraPosition.target
-            val current_zoom = map_view.map.cameraPosition.zoom
-            map_view.map.move(
-                CameraPosition(current_map_position, current_zoom, 0.0f, 0.0f)
-            )
-        }
-        button_zoom_area.setOnClickListener {
-            // TODO: сделать приближение/отдаление по оставшейся области пряток
-        }
-        button_questions.setOnClickListener {
-            if (questons_shown) {
-                questons_shown = false
-            } else {
-                settings_shown = false
-                questons_shown = true
-            }
-            refresh_layout_weights()
-        }
-        button_settings.setOnClickListener {
-            if (settings_shown) {
-                settings_shown = false
-            } else {
-                questons_shown = false
-                settings_shown = true
-            }
-            refresh_layout_weights()
-        }
-
-        // сделать какие-то функции перед запуском
-        refresh_layout_weights()
+        // подготовка интерфейса
+        prepare_interface()
 
         // блок тестового вывода
         test_output_block = findViewById(R.id.test_output)
@@ -109,6 +69,52 @@ class MainActivity : ComponentActivity() {
         super.onStop()
         MapKitFactory.getInstance().onStop()
         map_view.onStop()
+    }
+
+
+    private fun prepare_interface() {
+        // получение элементов интерфейса
+        setContentView(R.layout.activity_main)
+        map_view = findViewById(R.id.map_view)
+        button_orientation_north = findViewById(R.id.north_orientation_button)
+        button_zoom_area = findViewById(R.id.zoom_area_button)
+        button_questions = findViewById(R.id.toggle_questions_button)
+        button_settings = findViewById(R.id.toggle_settings_button)
+        layout_questions = findViewById(R.id.questions_layout)
+        layout_settings = findViewById(R.id.settings_layout)
+
+        // события клика на кнопки
+        button_orientation_north.setOnClickListener {
+            val current_map_position = map_view.map.cameraPosition.target
+            val current_zoom = map_view.map.cameraPosition.zoom
+            map_view.map.move(
+                CameraPosition(current_map_position, current_zoom, 0.0f, 0.0f)
+            )
+        }
+        button_zoom_area.setOnClickListener {
+            // TODO: сделать приближение/отдаление по оставшейся области поиска
+        }
+        button_questions.setOnClickListener {
+            if (questons_shown) {
+                questons_shown = false
+            } else {
+                settings_shown = false
+                questons_shown = true
+            }
+            refresh_layout_weights()
+        }
+        button_settings.setOnClickListener {
+            if (settings_shown) {
+                settings_shown = false
+            } else {
+                questons_shown = false
+                settings_shown = true
+            }
+            refresh_layout_weights()
+        }
+
+        // обновить весы высот интерфейса
+        refresh_layout_weights()
     }
 
 
