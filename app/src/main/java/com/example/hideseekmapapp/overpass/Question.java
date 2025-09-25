@@ -14,13 +14,4 @@ public interface Question {
 
     // применение ответа на вопрос
     void apply_answer();
-
-    // возврат ответа на вопрос
-    QuestionResult return_result();
-}
-
-
-class QuestionResult {
-    public ArrayList <Polygon> area;
-    public boolean inside;
 }

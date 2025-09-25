@@ -3,6 +3,8 @@ package com.example.hideseekmapapp.overpass;
 // TODO: полная реализация Tentacles вопросов
 
 public class Tentacles implements Question {
+    // какой это тип вопроса
+    public QuestionType type = QuestionType.TENTACLES;
 
 
 
@@ -29,11 +31,5 @@ public class Tentacles implements Question {
     @Override
     public void apply_answer() {
 
-    }
-
-
-    @Override
-    public QuestionResult return_result() {
-        return null;
     }
 }

@@ -5,6 +5,9 @@ import java.util.ArrayList;
 // TODO: полная реализация Matching вопросов
 
 public class Matching implements Question {
+    // какой это тип вопроса
+    public QuestionType type = QuestionType.MATCHING;
+
     // главные данные вопроса
     public MatchingType matching_type; // какой именно вопрос совпадения мы задаём
     public Long object_id; // объект, который мы ищем
@@ -41,11 +44,5 @@ public class Matching implements Question {
     @Override
     public void apply_answer() {
 
-    }
-
-
-    @Override
-    public QuestionResult return_result() {
-        return null;
     }
 }

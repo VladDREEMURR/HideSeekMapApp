@@ -9,46 +9,32 @@ import de.westnordost.osmapi.overpass.*;
 import de.westnordost.osmapi.map.data.*;
 import de.westnordost.osmapi.map.handler.*;
 
+import com.menecats.polybool.helpers.PolyBoolHelper;
+
 // TODO: протестировать обработку объектов (на примере точек музеев) (с отображением)
 // TODO: протестировать обработку объектов (на примере точек парков) (с отображением)
 // TODO: протестировать обработку объектов (получение областей районов и административных округов) (с отображением)
-// TODO: протестировать обработку объектов (булевы операции с областями) (с отображением)
 
 public class OverpassProcessor {
-    /*
-    Что включить:
-        1) Вытягивание запроса из вопроса
-        2) Отправка запроса и получение ответа
-        3) (здесь ли?) Форматирование в нормальном формате
-     */
+    private StringBuilder displayed_text = new StringBuilder();
 
-    private static final String TAG = OverpassProcessor.class.getSimpleName();
-
-    private int boundings = 0;
-    private int nodes = 0;
-    private int ways = 0;
-    private int relations = 0;
 
 
     private final MapDataHandler mapdata_handler = new MapDataHandler() {
         @Override
         public void handle(BoundingBox bounds) {
-            boundings++;
         }
 
         @Override
         public void handle(Node node) {
-            nodes++;
         }
 
         @Override
         public void handle(Way way) {
-            ways++;
         }
 
         @Override
         public void handle(Relation relation) {
-            relations++;
         }
     };
 
@@ -58,9 +44,7 @@ public class OverpassProcessor {
         public void handle(BoundingBox bounds) {}
 
         @Override
-        public void handle(Node node) {
-
-        }
+        public void handle(Node node) {}
 
         @Override
         public void handle(Way way) {}
@@ -79,45 +63,82 @@ public class OverpassProcessor {
 
 
     public String testOverpass() {
-//        OsmConnection connection = new OsmConnection("https://maps.mail.ru/osm/tools/overpass/api/", "my user agent");
-//        OverpassMapDataApi overpass = new OverpassMapDataApi(connection);
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 OsmConnection connection = new OsmConnection("https://maps.mail.ru/osm/tools/overpass/api/", "my user agent");
                 OverpassMapDataApi overpass = new OverpassMapDataApi(connection);
                 try {
+                    /*
                     ElementCount count = overpass.queryCount(
-                            "{{geocodeArea:Vienna}}->.searchArea;\n" +
-                                    "nwr[shop](area.searchArea);\n" +
+                            "[bbox:55.489,37.216,55.989,38.206];\n" +
+                                    "nwr[shop];\n" +
                                     "out count;"
                     );
-
+                    */
+                    overpass.queryElements("[bbox:55.489,37.216,55.989,38.206];\n" +
+                            "nwr[aeroway=aerodrome];\n" +
+                            "out geom;", mapdata_handler);
                 } catch (Exception e) {
                     StringWriter sw = new StringWriter();
                     PrintWriter pw = new PrintWriter(sw);
                     e.printStackTrace(pw);
                     String s = sw.toString();
+                    displayed_text.append(s);
+                    displayed_text.append('\n');
                 }
             }
         });
+        /*
         thread.start();
-        /*try {
+        try {
             thread.join();
         } catch (InterruptedException e) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
             String s = sw.toString();
-        }*/
-        StringBuilder sb = new StringBuilder();
-        sb.append(boundings);
-        sb.append('\n');
-        sb.append(nodes);
-        sb.append('\n');
-        sb.append(ways);
-        sb.append('\n');
-        sb.append(relations);
-        return sb.toString();
+            displayed_text.append(s);
+            displayed_text.append('\n');
+        }
+*/
+        com.menecats.polybool.models.Polygon p1 = PolyBoolHelper.polygon(
+                PolyBoolHelper.region(
+                        PolyBoolHelper.point(0,0),
+                        PolyBoolHelper.point(0,5),
+                        PolyBoolHelper.point(5,5),
+                        PolyBoolHelper.point(5,0),
+                        PolyBoolHelper.point(0,0)
+                )
+        );
+        com.menecats.polybool.models.Polygon p2 = PolyBoolHelper.polygon(
+                PolyBoolHelper.region(
+                        PolyBoolHelper.point(1,2),
+                        PolyBoolHelper.point(1,4),
+                        PolyBoolHelper.point(3,4),
+                        PolyBoolHelper.point(3,2),
+                        PolyBoolHelper.point(1,2)
+                )
+        );
+        com.menecats.polybool.models.Polygon p3 = PolyBoolHelper.polygon(
+                PolyBoolHelper.region(
+                        PolyBoolHelper.point(3,1),
+                        PolyBoolHelper.point(3,3),
+                        PolyBoolHelper.point(6,3),
+                        PolyBoolHelper.point(6,1),
+                        PolyBoolHelper.point(3,1)
+                )
+        );
+        com.menecats.polybool.models.Polygon res = com.menecats.polybool.PolyBool.difference(
+                PolyBoolHelper.epsilon(),
+                p1,
+                p2
+        );
+        res = com.menecats.polybool.PolyBool.difference(
+                PolyBoolHelper.epsilon(),
+                res,
+                p3
+        );
+        return displayed_text.toString();
     }
 }

@@ -3,6 +3,8 @@ package com.example.hideseekmapapp.overpass;
 // TODO: полная реализация Thermometer вопросов
 
 public class Thermometer implements Question {
+    // какой это тип вопроса
+    public QuestionType type = QuestionType.THERMOMETER;
 
 
 
@@ -30,11 +32,5 @@ public class Thermometer implements Question {
     @Override
     public void apply_answer() {
 
-    }
-
-
-    @Override
-    public QuestionResult return_result() {
-        return null;
     }
 }
