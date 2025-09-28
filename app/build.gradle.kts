@@ -60,19 +60,21 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    // нужные библиотеки
-    implementation(libs.maps.mobile) // яндекс карты
+    // яндекс карты
+    implementation(libs.maps.mobile)
 
-    implementation(libs.voronoikotlin) // полигоны вороного
+    // полигоны вороного
+    implementation(libs.voronoikotlin)
 
+    // запросы в overpass
     implementation("de.westnordost:osmapi-overpass:3.0")
+
+    // булевы операции с мультиполигонами
+    implementation("org.locationtech.jts:jts-core:1.20.0")
 
     // адаптация некоторых функций turf (JAVA)
     implementation("com.mapbox.mapboxsdk:mapbox-sdk-geojson:7.7.0")
     implementation("com.mapbox.mapboxsdk:mapbox-sdk-services:7.7.0")
     implementation("com.mapbox.mapboxsdk:mapbox-sdk-turf:7.7.0")
     implementation("com.mapbox.mapboxsdk:mapbox-sdk-core:7.7.0")
-    implementation("androidx.annotation:annotation:1.0.0")
-
-    implementation("com.menecats:polybool-java:1.0.1") // булевые операции с областями (JAVA)
 }

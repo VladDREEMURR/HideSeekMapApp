@@ -1,6 +1,6 @@
 package com.example.hideseekmapapp
 
-
+import com.example.hideseekmapapp.overpass.OverpassProcessor
 
 import android.os.Bundle
 import android.view.View
@@ -10,10 +10,11 @@ import android.widget.GridLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.ComponentActivity
+
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.mapview.MapView
-import com.example.hideseekmapapp.overpass.OverpassProcessor
 import com.yandex.mapkit.map.CameraPosition
+import com.yandex.mapkit.geometry.Polygon
 
 // TODO: сделать рабочей область вопросов и настроек (возможно, отребуются отдельные классы для управления этими категориями)
 // TODO: протестировать зарисовку областей на карте через OverpassProcessor
