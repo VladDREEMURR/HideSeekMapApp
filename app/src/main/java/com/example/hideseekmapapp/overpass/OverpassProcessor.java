@@ -102,7 +102,6 @@ public class OverpassProcessor {
             displayed_text.append('\n');
         }
 */
-        GeometryFactory GF = new GeometryFactory();
         return displayed_text.toString();
     }
 }

@@ -1,5 +1,8 @@
 package com.example.hideseekmapapp.overpass;
 
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
+
 import java.util.ArrayList;
 
 // TODO: полная реализация Matching вопросов
@@ -42,7 +45,7 @@ public class Matching implements Question {
 
 
     @Override
-    public void apply_answer() {
+    public void generate_answer(double x, double y) {
 
     }
 }

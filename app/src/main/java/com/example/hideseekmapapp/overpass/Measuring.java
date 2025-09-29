@@ -29,7 +29,7 @@ public class Measuring implements Question {
 
 
     @Override
-    public void apply_answer() {
+    public void generate_answer(double x, double y) {
 
     }
 }

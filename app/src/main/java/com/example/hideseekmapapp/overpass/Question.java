@@ -1,7 +1,5 @@
 package com.example.hideseekmapapp.overpass;
 
-import java.util.ArrayList;
-
 public interface Question {
     // подготовка исходных данных, полученных из конструктора классов, применяющих этот интерфейс
     void prepare();
@@ -13,5 +11,5 @@ public interface Question {
     void create_areas();
 
     // применение ответа на вопрос
-    void apply_answer();
+    void generate_answer(double x, double y);
 }

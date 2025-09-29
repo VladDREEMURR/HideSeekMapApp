@@ -10,11 +10,12 @@ import android.widget.GridLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.ComponentActivity
+import com.example.hideseekmapapp.overpass.Radar
+import com.example.hideseekmapapp.overpass.Thermometer
 
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.mapkit.map.CameraPosition
-import com.yandex.mapkit.geometry.Polygon
 
 // TODO: сделать рабочей область вопросов и настроек (возможно, отребуются отдельные классы для управления этими категориями)
 // TODO: протестировать зарисовку областей на карте через OverpassProcessor
@@ -44,7 +45,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // карты подготовка
+        // яндекс карты подготовка
         MapKitFactory.setApiKey("60b6e681-e142-4dd6-8f98-73996515ab97")
         MapKitFactory.initialize(this@MainActivity)
 
@@ -56,6 +57,27 @@ class MainActivity : ComponentActivity() {
 
         // some code
         test_output_block.text = overpass_processor.testOverpass()
+
+        // пример использования радара
+        var rad : Radar = Radar(37.620, 55.754, 10.0)
+        rad.create_areas()
+        var circle : org.locationtech.jts.geom.Polygon = rad.area
+        var mapLinRing : com.yandex.mapkit.geometry.LinearRing = com.yandex.mapkit.geometry.LinearRing(circle.exteriorRing.coordinates.map { com.yandex.mapkit.geometry.Point(it.y, it.x) })
+        var mapPolygon : com.yandex.mapkit.geometry.Polygon = com.yandex.mapkit.geometry.Polygon(mapLinRing, emptyList<com.yandex.mapkit.geometry.LinearRing>())
+//        map_view.map.mapObjects.addPolygon(mapPolygon)
+
+        // пример использования термометра
+        var thermo : Thermometer = Thermometer(circle, 37.604, 55.748, 37.641, 55.760)
+        thermo.create_areas()
+        var collection : Collection<org.locationtech.jts.geom.Polygon> = thermo.polygons
+//        for (var i : Iterator<org.locationtech.jts.geom.Polygon> = collection.iterator(); i.hasNext();) {
+//            var p = i.next()
+        for (p in collection) {
+            mapLinRing = com.yandex.mapkit.geometry.LinearRing(p.exteriorRing.coordinates.map { com.yandex.mapkit.geometry.Point(it.y, it.x) })
+            mapPolygon = com.yandex.mapkit.geometry.Polygon(mapLinRing, emptyList<com.yandex.mapkit.geometry.LinearRing>())
+//            map_view.map.mapObjects.addPolygon(mapPolygon)
+        }
+        map_view.map.mapObjects.addPolygon(mapPolygon)
     }
 
 
