@@ -10,12 +10,19 @@ import android.widget.GridLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.ComponentActivity
+
 import com.example.hideseekmapapp.overpass.Radar
 import com.example.hideseekmapapp.overpass.Thermometer
 
+import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
+import com.yandex.mapkit.geometry.BoundingBox
+import com.yandex.mapkit.geometry.Geometry
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.mapkit.map.CameraPosition
+import com.yandex.mapkit.geometry.Polygon
+import com.yandex.mapkit.geometry.LinearRing
+import com.yandex.mapkit.geometry.Point
 
 // TODO: сделать рабочей область вопросов и настроек (возможно, отребуются отдельные классы для управления этими категориями)
 // TODO: протестировать зарисовку областей на карте через OverpassProcessor
@@ -25,6 +32,7 @@ class MainActivity : ComponentActivity() {
     // режим приложения
     private var mode : String = "seeker" // "seeker" или "hider"
 
+    // содержатели элементов меню
     private lateinit var map_view : MapView
     private lateinit var button_orientation_north : Button
     private lateinit var button_zoom_area : Button
@@ -33,8 +41,13 @@ class MainActivity : ComponentActivity() {
     private lateinit var layout_questions : LinearLayout
     private lateinit var layout_settings : GridLayout
 
+    // показываем ли элементы меню
     private var questons_shown : Boolean = false
     private var settings_shown : Boolean = false
+
+    // зона поиска
+    private lateinit var remaining_area : org.locationtech.jts.geom.Geometry
+    private lateinit var bounding_box : BoundingBox
 
     private var overpass_processor : OverpassProcessor = OverpassProcessor()
 
@@ -58,26 +71,21 @@ class MainActivity : ComponentActivity() {
         // some code
         test_output_block.text = overpass_processor.testOverpass()
 
+        var polygonizer : org.locationtech.jts.operation.polygonize.Polygonizer = org.locationtech.jts.operation.polygonize.Polygonizer(true)
+
         // пример использования радара
         var rad : Radar = Radar(37.620, 55.754, 10.0)
         rad.create_areas()
-        var circle : org.locationtech.jts.geom.Polygon = rad.area
-        var mapLinRing : com.yandex.mapkit.geometry.LinearRing = com.yandex.mapkit.geometry.LinearRing(circle.exteriorRing.coordinates.map { com.yandex.mapkit.geometry.Point(it.y, it.x) })
-        var mapPolygon : com.yandex.mapkit.geometry.Polygon = com.yandex.mapkit.geometry.Polygon(mapLinRing, emptyList<com.yandex.mapkit.geometry.LinearRing>())
-//        map_view.map.mapObjects.addPolygon(mapPolygon)
+//        add_polygon_to_map(rad.area)
 
         // пример использования термометра
-        var thermo : Thermometer = Thermometer(circle, 37.604, 55.748, 37.641, 55.760)
+        var thermo : Thermometer = Thermometer(rad.area, 37.604, 55.748, 37.641, 55.760)
         thermo.create_areas()
         var collection : Collection<org.locationtech.jts.geom.Polygon> = thermo.polygons
-//        for (var i : Iterator<org.locationtech.jts.geom.Polygon> = collection.iterator(); i.hasNext();) {
-//            var p = i.next()
         for (p in collection) {
-            mapLinRing = com.yandex.mapkit.geometry.LinearRing(p.exteriorRing.coordinates.map { com.yandex.mapkit.geometry.Point(it.y, it.x) })
-            mapPolygon = com.yandex.mapkit.geometry.Polygon(mapLinRing, emptyList<com.yandex.mapkit.geometry.LinearRing>())
-//            map_view.map.mapObjects.addPolygon(mapPolygon)
         }
-        map_view.map.mapObjects.addPolygon(mapPolygon)
+        remaining_area = collection.first()
+        draw_remaining_area()
     }
 
 
@@ -95,6 +103,35 @@ class MainActivity : ComponentActivity() {
     }
 
 
+    private fun unite_polygon_with_remaining(polygon : org.locationtech.jts.geom.Polygon) {
+        // TODO: доделать объединение с областью поиска
+    }
+
+
+    private fun draw_remaining_area() {
+        // TODO: учитывать внутренние границы геометрии
+        val polygonizer : org.locationtech.jts.operation.polygonize.Polygonizer = org.locationtech.jts.operation.polygonize.Polygonizer(true)
+        polygonizer.add(remaining_area)
+        val polygon_collection = polygonizer.polygons as Collection<org.locationtech.jts.geom.Polygon>
+        for (p in polygon_collection) {
+            add_polygon_to_map(p)
+        }
+    }
+
+
+    private fun add_polygon_to_map(polygon : org.locationtech.jts.geom.Polygon) {
+        // TODO: учитывать внутренние границы геометрии
+        val mapLinRing : LinearRing = LinearRing(polygon.exteriorRing.coordinates.map { Point(it.y, it.x) })
+        val mapPolygon : Polygon = Polygon(mapLinRing, emptyList<LinearRing>())
+        map_view.map.mapObjects.addPolygon(mapPolygon)
+    }
+
+
+    private fun clear_map() {
+        map_view.map.mapObjects.clear()
+    }
+
+
     private fun prepare_interface() {
         // получение элементов интерфейса
         setContentView(R.layout.activity_main)
@@ -107,15 +144,28 @@ class MainActivity : ComponentActivity() {
         layout_settings = findViewById(R.id.settings_layout)
 
         // события клика на кнопки
-        button_orientation_north.setOnClickListener {
+        button_orientation_north.setOnClickListener { // ориентация на север
             val current_map_position = map_view.map.cameraPosition.target
             val current_zoom = map_view.map.cameraPosition.zoom
             map_view.map.move(
-                CameraPosition(current_map_position, current_zoom, 0.0f, 0.0f)
+                CameraPosition(current_map_position, current_zoom, 0.0f, 0.0f),
+                Animation(Animation.Type.SMOOTH, 0.5f),
+                null
             )
         }
-        button_zoom_area.setOnClickListener {
-            // TODO: сделать приближение/отдаление по оставшейся области поиска
+        button_zoom_area.setOnClickListener { // зум по области
+            val bounding_box : org.locationtech.jts.geom.Envelope = remaining_area.envelopeInternal
+            val map_bounding = BoundingBox(
+                Point(bounding_box.minY, bounding_box.minX),
+                Point(bounding_box.maxY, bounding_box.maxX)
+            )
+            var camera_pos = map_view.map.cameraPosition(Geometry.fromBoundingBox(map_bounding))
+            camera_pos = CameraPosition(camera_pos.target, camera_pos.zoom - 0.8f, camera_pos.azimuth, camera_pos.tilt)
+            map_view.map.move(
+                camera_pos,
+                Animation(Animation.Type.SMOOTH, 1.0f),
+                null
+            )
         }
         button_questions.setOnClickListener {
             if (questons_shown) {
