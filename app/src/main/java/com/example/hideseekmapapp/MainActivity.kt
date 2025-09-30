@@ -10,6 +10,8 @@ import android.widget.GridLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.ComponentActivity
+import android.graphics.Color
+import androidx.core.content.ContextCompat
 
 import com.example.hideseekmapapp.overpass.Radar
 import com.example.hideseekmapapp.overpass.Thermometer
@@ -23,6 +25,8 @@ import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.geometry.Polygon
 import com.yandex.mapkit.geometry.LinearRing
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.map.PlacemarkMapObject
+import com.yandex.mapkit.map.PolygonMapObject
 
 // TODO: сделать рабочей область вопросов и настроек (возможно, отребуются отдельные классы для управления этими категориями)
 // TODO: протестировать зарисовку областей на карте через OverpassProcessor
@@ -79,13 +83,26 @@ class MainActivity : ComponentActivity() {
 //        add_polygon_to_map(rad.area)
 
         // пример использования термометра
-        var thermo : Thermometer = Thermometer(rad.area, 37.604, 55.748, 37.641, 55.760)
-        thermo.create_areas()
-        var collection : Collection<org.locationtech.jts.geom.Polygon> = thermo.polygons
-        for (p in collection) {
+        var start_x = 37.60
+        var start_y = 55.74
+        var end_x = 37.66
+        var end_y = 55.76
+        for (i in 1..1) {
+            var thermo : Thermometer = Thermometer(rad.area, start_x, start_y, end_x, end_y)
+            var polygons = thermo.polygons
+            remaining_area = polygons[0]
+            for (p in polygons) {
+                add_polygon_to_map(p)
+            }
+            add_point_to_map(thermo.start_point)
+            add_point_to_map(thermo.end_point)
+
+            start_x += 0.01
+            start_y += 0.01
         }
-        remaining_area = collection.first()
-        draw_remaining_area()
+
+//        remaining_area = polygons[0]
+//        draw_remaining_area()
     }
 
 
@@ -119,11 +136,25 @@ class MainActivity : ComponentActivity() {
     }
 
 
+    private fun add_point_to_map(point : org.locationtech.jts.geom.Point) {
+        val map_p = Point(point.y, point.x)
+        val placemark : PlacemarkMapObject = map_view.map.mapObjects.addPlacemark(map_p)
+    }
+
+
     private fun add_polygon_to_map(polygon : org.locationtech.jts.geom.Polygon) {
         // TODO: учитывать внутренние границы геометрии
         val mapLinRing : LinearRing = LinearRing(polygon.exteriorRing.coordinates.map { Point(it.y, it.x) })
         val mapPolygon : Polygon = Polygon(mapLinRing, emptyList<LinearRing>())
-        map_view.map.mapObjects.addPolygon(mapPolygon)
+        var map_obj : PolygonMapObject = map_view.map.mapObjects.addPolygon(mapPolygon)
+        map_obj.apply {
+            strokeWidth = 1.0f
+            strokeColor = ContextCompat.getColor(this@MainActivity, R.color.red_dark)
+            fillColor = Color.argb(
+                20,
+                3, 218, 197
+            )
+        }
     }
 
 
