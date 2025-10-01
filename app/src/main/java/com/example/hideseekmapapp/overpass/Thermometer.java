@@ -33,13 +33,25 @@ public class Thermometer implements Question {
     public Thermometer (Geometry input_area, double start_x, double start_y, double end_x, double end_y) {
         GeometryFactory GF = new GeometryFactory();
 
+        // обработать входные данные
         bounding_box = input_area.getEnvelopeInternal();
         start_point = GF.createPoint(new Coordinate(start_x, start_y));
         end_point = GF.createPoint(new Coordinate(end_x, end_y));
 
+        // создание диаграммы
         Point[] points = {start_point, end_point};
         MapVoronoiCreator MVC = new MapVoronoiCreator(bounding_box, points);
         polygons = MVC.polygons;
+
+        // записать "горячую" и "холодную" области
+        for (int i = 0; i < polygons.length; i++) {
+            if (polygons[i].covers(start_point)) {
+                colder_area = polygons[i];
+            }
+            if (polygons[i].covers(end_point)) {
+                hotter_area = polygons[i];
+            }
+        }
     }
 
 
@@ -49,7 +61,16 @@ public class Thermometer implements Question {
     public void exec_overpass() {}
     @Override
     public void create_areas() {}
-    @Override
-    public void generate_answer(double x, double y) {}
 
+
+    @Override
+    public void generate_answer(double x, double y) {
+        GeometryFactory GF = new GeometryFactory();
+        Point p = GF.createPoint(new Coordinate(x, y));
+        if (hotter_area.covers(p)) {
+            hotter = true;
+        } else {
+            hotter = false;
+        }
+    }
 }
