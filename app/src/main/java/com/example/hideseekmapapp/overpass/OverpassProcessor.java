@@ -76,9 +76,10 @@ public class OverpassProcessor {
                                     "out count;"
                     );
                     */
-                    overpass.queryElements("[bbox:55.489,37.216,55.989,38.206];\n" +
+                    ElementCount count = overpass.queryCount("[bbox:55.489,37.216,55.989,38.206];\n" +
                             "nwr[aeroway=aerodrome];\n" +
-                            "out geom;", mapdata_handler);
+                            "out count;");
+                    displayed_text.append(count.total);
                 } catch (Exception e) {
                     StringWriter sw = new StringWriter();
                     PrintWriter pw = new PrintWriter(sw);
@@ -89,7 +90,7 @@ public class OverpassProcessor {
                 }
             }
         });
-        /*
+
         thread.start();
         try {
             thread.join();
@@ -101,7 +102,7 @@ public class OverpassProcessor {
             displayed_text.append(s);
             displayed_text.append('\n');
         }
-*/
+
         return displayed_text.toString();
     }
 }

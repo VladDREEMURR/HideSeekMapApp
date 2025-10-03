@@ -4,7 +4,7 @@ public enum MatchingType {
     COMMERCIAL_AIRPORT,
     TRAIN_TERMINAL,
     PARK,
-    AMUSEMENT_PARK,
+    THEME_PARK,
     ZOO,
     GOLF_FIELD,
     MUSEUM,

@@ -5,7 +5,7 @@ public enum MeasuringType {
     MCD_STATION,
     TRAIN_TERMINAL,
     SUBWAY_STATION,
-    AMUSEMENT_PARK,
+    THEME_PARK,
     ZOO,
     GOLF_FIELD,
     MUSEUM,
