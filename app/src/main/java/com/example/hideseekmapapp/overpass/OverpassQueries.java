@@ -62,7 +62,15 @@ public class OverpassQueries {
                     "relation[\"type\"=\"boundary\"][\"boundary\"=\"administrative\"][\"admin_level\"=\"5\"];\n" +
                     "out body;";
     public static String MCD_STATION =
-            "";
+            "[out:json][timeout:25][bbox:55.500,37.216,55.989,38.000];\n" +
+                    "(\n" +
+                    "  relation[\"ref\"=\"D1\"][\"type\"=\"route\"]; >>;\n" +
+                    "  relation[\"ref\"=\"D2\"][\"type\"=\"route\"]; >>;\n" +
+                    "  relation[\"ref\"=\"D3\"][\"type\"=\"route\"]; >>;\n" +
+                    "  relation[\"ref\"=\"D4\"][\"type\"=\"route\"]; >>;\n" +
+                    ") -> .routes;\n" +
+                    "node.routes[\"railway\"=\"stop\"];\n" +
+                    "out body;";
     public static String SUBWAY_STATION =
             "";
 }
