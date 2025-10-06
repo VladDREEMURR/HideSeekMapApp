@@ -1,9 +1,12 @@
 package com.example.hideseekmapapp.overpass;
 
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 
 import de.westnordost.osmapi.*;
 import de.westnordost.osmapi.common.*;
@@ -17,6 +20,8 @@ import de.westnordost.osmapi.map.handler.*;
 
 public class OverpassProcessor {
     private StringBuilder displayed_text = new StringBuilder();
+    private ArrayList<Point> points = new ArrayList<>();
+    private GeometryFactory GF = new GeometryFactory();
 
 
 
@@ -27,6 +32,10 @@ public class OverpassProcessor {
 
         @Override
         public void handle(Node node) {
+            Point p = GF.createPoint(
+                    new Coordinate(node.getPosition().getLongitude(), node.getPosition().getLatitude())
+            );
+            points.add(p);
         }
 
         @Override
@@ -62,7 +71,7 @@ public class OverpassProcessor {
     };
 
 
-    public String testOverpass() {
+    public Point[] testOverpass() {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -76,9 +85,13 @@ public class OverpassProcessor {
                                     "out count;"
                     );
                     */
-                    ElementCount count = overpass.queryCount("[bbox:55.489,37.216,55.989,38.206];\n" +
-                            "nwr[aeroway=aerodrome];\n" +
-                            "out count;");
+                    ElementCount count = overpass.queryCount("[timeout:25][bbox:55.489,37.216,55.989,38.206];\n" +
+                            "(\n" +
+                            "  node[\"public_transport\"=\"station\"][\"railway\"=\"station\"][\"train\"=\"yes\"];\n" +
+                            "  node[\"public_transport\"=\"station\"][\"railway\"=\"halt\"][\"train\"=\"yes\"];\n" +
+                            ");\n" +
+                            "out body;");
+                    overpass.queryElements(OverpassQueries.TRAIN_TERMINAL, mapdata_handler);
                     displayed_text.append(count.total);
                 } catch (Exception e) {
                     StringWriter sw = new StringWriter();
@@ -103,6 +116,8 @@ public class OverpassProcessor {
             displayed_text.append('\n');
         }
 
-        return displayed_text.toString();
+        Point[] pts = new Point[points.size()];
+        points.toArray(pts);
+        return pts;
     }
 }

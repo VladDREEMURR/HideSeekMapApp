@@ -6,12 +6,12 @@ public class OverpassQueries {
                     "nwr[\"aeroway\"=\"aerodrome\"][\"aerodrome:type\"=\"public\"];\n" +
                     "out body;";
     public static String TRAIN_TERMINAL =
-            "[out:json][timeout:25][bbox:55.489,37.216,55.989,38.206];\n" +
+            "[out:xml][timeout:25][bbox:55.489,37.216,55.989,38.206];\n" +
                     "(\n" +
                     "  node[\"public_transport\"=\"station\"][\"railway\"=\"station\"][\"train\"=\"yes\"];\n" +
                     "  node[\"public_transport\"=\"station\"][\"railway\"=\"halt\"][\"train\"=\"yes\"];\n" +
                     ");\n" +
-                    "out body;";
+                    "out meta;";
     public static String PARK =
             "[out:json][timeout:25][bbox:55.489,37.216,55.989,38.000];\n" +
                     "nwr[\"leisure\"=\"park\"][\"name\"];\n" +
@@ -61,16 +61,4 @@ public class OverpassQueries {
             "[out:json][timeout:25][bbox:55.550,37.216,55.989,38.000];\n" +
                     "relation[\"type\"=\"boundary\"][\"boundary\"=\"administrative\"][\"admin_level\"=\"5\"];\n" +
                     "out body;";
-    public static String MCD_STATION =
-            "[out:json][timeout:25][bbox:55.500,37.216,55.989,38.000];\n" +
-                    "(\n" +
-                    "  relation[\"ref\"=\"D1\"][\"type\"=\"route\"]; >>;\n" +
-                    "  relation[\"ref\"=\"D2\"][\"type\"=\"route\"]; >>;\n" +
-                    "  relation[\"ref\"=\"D3\"][\"type\"=\"route\"]; >>;\n" +
-                    "  relation[\"ref\"=\"D4\"][\"type\"=\"route\"]; >>;\n" +
-                    ") -> .routes;\n" +
-                    "node.routes[\"railway\"=\"stop\"];\n" +
-                    "out body;";
-    public static String SUBWAY_STATION =
-            "";
 }

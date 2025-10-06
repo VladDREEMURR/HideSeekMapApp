@@ -57,6 +57,7 @@ class MainActivity : ComponentActivity() {
 
     // для тестирования
     private lateinit var test_output_block : TextView
+    private lateinit var point_array : Array<org.locationtech.jts.geom.Point>
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,7 +74,10 @@ class MainActivity : ComponentActivity() {
         test_output_block = findViewById(R.id.test_output)
 
         // some code
-        test_output_block.text = overpass_processor.testOverpass()
+        point_array = overpass_processor.testOverpass()
+        for (p in point_array) {
+            add_point_to_map(p)
+        }
 
         var polygonizer : org.locationtech.jts.operation.polygonize.Polygonizer = org.locationtech.jts.operation.polygonize.Polygonizer(true)
 
@@ -94,8 +98,8 @@ class MainActivity : ComponentActivity() {
             for (p in polygons) {
                 add_polygon_to_map(p)
             }
-            add_point_to_map(thermo.start_point)
-            add_point_to_map(thermo.end_point)
+//            add_point_to_map(thermo.start_point)
+//            add_point_to_map(thermo.end_point)
 
             start_x += 0.01
             start_y += 0.01

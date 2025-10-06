@@ -9,8 +9,6 @@ import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.operation.polygonize.Polygonizer;
 import org.locationtech.jts.triangulate.VoronoiDiagramBuilder;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Collection;
 
 public class MapVoronoiCreator {

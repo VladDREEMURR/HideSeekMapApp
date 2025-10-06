@@ -1,19 +1,11 @@
 package com.example.hideseekmapapp.overpass;
 
-// TODO: полная реализация Thermometer вопросов
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
-import org.locationtech.jts.operation.polygonize.Polygonizer;
-import org.locationtech.jts.triangulate.VoronoiDiagramBuilder;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Collection;
 
 public class Thermometer implements Question {
     public QuestionType type = QuestionType.THERMOMETER;
