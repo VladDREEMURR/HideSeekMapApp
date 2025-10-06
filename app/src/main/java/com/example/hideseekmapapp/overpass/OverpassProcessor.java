@@ -78,19 +78,12 @@ public class OverpassProcessor {
                 OsmConnection connection = new OsmConnection("https://maps.mail.ru/osm/tools/overpass/api/", "my user agent");
                 OverpassMapDataApi overpass = new OverpassMapDataApi(connection);
                 try {
-                    /*
-                    ElementCount count = overpass.queryCount(
-                            "[bbox:55.489,37.216,55.989,38.206];\n" +
-                                    "nwr[shop];\n" +
-                                    "out count;"
-                    );
-                    */
                     ElementCount count = overpass.queryCount("[timeout:25][bbox:55.489,37.216,55.989,38.206];\n" +
                             "(\n" +
                             "  node[\"public_transport\"=\"station\"][\"railway\"=\"station\"][\"train\"=\"yes\"];\n" +
                             "  node[\"public_transport\"=\"station\"][\"railway\"=\"halt\"][\"train\"=\"yes\"];\n" +
                             ");\n" +
-                            "out body;");
+                            "out count;");
                     overpass.queryElements(OverpassQueries.TRAIN_TERMINAL, mapdata_handler);
                     displayed_text.append(count.total);
                 } catch (Exception e) {
