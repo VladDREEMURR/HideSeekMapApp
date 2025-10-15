@@ -10,6 +10,9 @@ import org.locationtech.jts.geom.Polygon;
 public class Thermometer implements Question {
     public QuestionType type = QuestionType.THERMOMETER;
 
+    // статусы вопроса
+    public boolean answered;
+
     // входные параметры
     public Envelope bounding_box;
     public Point start_point;
@@ -21,16 +24,38 @@ public class Thermometer implements Question {
     public boolean hotter = true; // hotter = true, если ближе к end_point
     public Polygon[] polygons;
 
+    // private
+    private GeometryFactory GF;
+
+
 
     public Thermometer (Geometry input_area, double start_x, double start_y, double end_x, double end_y) {
-        GeometryFactory GF = new GeometryFactory();
+        GF = new GeometryFactory();
 
-        // обработать входные данные
+        answered = false;
+
         bounding_box = input_area.getEnvelopeInternal();
         start_point = GF.createPoint(new Coordinate(start_x, start_y));
         end_point = GF.createPoint(new Coordinate(end_x, end_y));
 
-        // создание диаграммы
+        create_areas();
+    }
+
+
+
+    // делаем выводы после получения ответа
+    public void set_answer (boolean hotter) {
+        this.hotter = hotter;
+        answered = true;
+    }
+
+
+
+    @Override
+    public void exec_overpass() {}
+    @Override
+    public void create_areas() {
+        // создание диаграммы Вороного
         Point[] points = {start_point, end_point};
         MapVoronoiCreator MVC = new MapVoronoiCreator(bounding_box, points);
         polygons = MVC.polygons;
@@ -47,17 +72,9 @@ public class Thermometer implements Question {
     }
 
 
-    @Override
-    public void prepare() {}
-    @Override
-    public void exec_overpass() {}
-    @Override
-    public void create_areas() {}
-
 
     @Override
     public void generate_answer(double x, double y) {
-        GeometryFactory GF = new GeometryFactory();
         Point p = GF.createPoint(new Coordinate(x, y));
         if (hotter_area.covers(p)) {
             hotter = true;

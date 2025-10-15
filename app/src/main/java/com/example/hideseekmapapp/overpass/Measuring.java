@@ -10,11 +10,6 @@ public class Measuring implements Question {
 
 
 
-    @Override
-    public void prepare() {
-
-    }
-
 
     @Override
     public void exec_overpass() {

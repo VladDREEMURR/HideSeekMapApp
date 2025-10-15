@@ -11,6 +11,9 @@ import java.util.List;
 public class Radar implements Question {
     public QuestionType type = QuestionType.RADAR;
 
+    // статусы вопроса
+    public boolean answered;
+
     // входные пааремтры
     public double radius; // радиус в километрах
     public double lon; // центральная точка (x)
@@ -20,18 +23,35 @@ public class Radar implements Question {
     public Polygon area = null;
     public boolean is_inside = true;
 
+    // private
+    private GeometryFactory GF;
+
+
 
     public Radar (double x, double y, double radius) {
+        GF = new GeometryFactory();
+
+        answered = false;
+
         this.lon = x;
         this.lat = y;
         this.radius = radius;
+
+        create_areas();
+    }
+
+
+
+    // делаем выводы после получения ответа
+    public void set_answer (boolean inside) {
+        is_inside = inside;
+        answered = true;
     }
 
 
     @Override
-    public void prepare() {}
-    @Override
-    public void exec_overpass() {}
+    public void exec_overpass() {
+    }
 
 
     @Override
@@ -45,16 +65,15 @@ public class Radar implements Question {
         for (com.mapbox.geojson.Point p : points) {
             coord_list.add(new Coordinate(p.longitude(), p.latitude()));
         }
-        GeometryFactory GF = new GeometryFactory();
         Coordinate[] coord_array = new Coordinate[coord_list.size()];
         coord_list.toArray(coord_array);
         area = GF.createPolygon(coord_array);
     }
 
 
+
     @Override
     public void generate_answer(double x, double y) {
-        GeometryFactory GF = new GeometryFactory();
         Point p = GF.createPoint(new Coordinate(x, y));
         is_inside = area.covers(p);
     }
