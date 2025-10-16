@@ -56,7 +56,7 @@ public class OverpassProcessor {
             @Override
             public void run() {
                 try {
-                    overpass.queryElementsWithGeometry(OverpassQueries.ADMINISTRATIVE_DISTRICT, geom_handler);
+                    overpass.queryElementsWithGeometry(OverpassQueries.TRAIN_TERMINAL, geom_handler);
                 } catch (Exception e) {
                     StringWriter sw = new StringWriter();
                     PrintWriter pw = new PrintWriter(sw);

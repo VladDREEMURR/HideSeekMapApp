@@ -12,6 +12,8 @@ import android.widget.TextView
 import androidx.activity.ComponentActivity
 import android.graphics.Color
 import androidx.core.content.ContextCompat
+import com.example.hideseekmapapp.overpass.Matching
+import com.example.hideseekmapapp.overpass.OverpassQueries
 
 import com.example.hideseekmapapp.overpass.Radar
 import com.example.hideseekmapapp.overpass.Thermometer
@@ -50,7 +52,7 @@ class MainActivity : ComponentActivity() {
     private var settings_shown : Boolean = false
 
     // зона поиска
-    private lateinit var remaining_area : org.locationtech.jts.geom.Geometry
+    private lateinit var remaining_area : org.locationtech.jts.geom.MultiPolygon
     private lateinit var bounding_box : BoundingBox
 
     private var overpass_processor : OverpassProcessor = OverpassProcessor()
@@ -79,34 +81,40 @@ class MainActivity : ComponentActivity() {
             add_point_to_map(p)
         }
 
-        var polygonizer : org.locationtech.jts.operation.polygonize.Polygonizer = org.locationtech.jts.operation.polygonize.Polygonizer(true)
-
         // пример использования радара
         var rad : Radar = Radar(37.620, 55.754, 10.0)
         rad.create_areas()
 //        add_polygon_to_map(rad.area)
 
         // пример использования термометра
-        var start_x = 37.60
-        var start_y = 55.74
-        var end_x = 37.66
-        var end_y = 55.76
-        for (i in 1..1) {
-            var thermo : Thermometer = Thermometer(rad.area, start_x, start_y, end_x, end_y)
-            var polygons = thermo.polygons
-            remaining_area = polygons[0]
-            for (p in polygons) {
-                add_polygon_to_map(p)
-            }
-//            add_point_to_map(thermo.start_point)
-//            add_point_to_map(thermo.end_point)
+        try {
+            var start_x = 37.60
+            var start_y = 55.74
+            var end_x = 37.66
+            var end_y = 55.76
+//        var thermo : Thermometer = Thermometer(rad.area, start_x, start_y, end_x, end_y)
+            var matching : Matching = Matching(OverpassQueries.TRAIN_TERMINAL)
 
-            start_x += 0.01
-            start_y += 0.01
+            var i = 0;
+            while (i < matching.polygons.size) {
+                if (matching.polygons[i] == null) {
+                    throw Exception("Found null at " + i.toString())
+                }
+                i += 1
+            }
+
+            remaining_area = org.locationtech.jts.geom.MultiPolygon(matching.polygons, org.locationtech.jts.geom.GeometryFactory())
+//        draw_remaining_area()
+            /*
+            for (multipolygon in matching.variants.values) {
+                add_multipolygon_to_map(multipolygon)
+            }
+            */
+            add_polygon_array_to_map(matching.polygons)
+        } catch (e : Exception) {
+            val s : String = e.stackTraceToString()
         }
 
-//        remaining_area = polygons[0]
-//        draw_remaining_area()
     }
 
 
@@ -130,19 +138,27 @@ class MainActivity : ComponentActivity() {
 
 
     private fun draw_remaining_area() {
-        // TODO: учитывать внутренние границы геометрии
-        val polygonizer : org.locationtech.jts.operation.polygonize.Polygonizer = org.locationtech.jts.operation.polygonize.Polygonizer(true)
-        polygonizer.add(remaining_area)
-        val polygon_collection = polygonizer.polygons as Collection<org.locationtech.jts.geom.Polygon>
-        for (p in polygon_collection) {
-            add_polygon_to_map(p)
-        }
+        add_multipolygon_to_map(remaining_area)
     }
 
 
     private fun add_point_to_map(point : org.locationtech.jts.geom.Point) {
         val map_p = Point(point.y, point.x)
         val placemark : PlacemarkMapObject = map_view.map.mapObjects.addPlacemark(map_p)
+    }
+
+
+    private fun add_multipolygon_to_map(multipolygon : org.locationtech.jts.geom.MultiPolygon) {
+        val count = multipolygon.numGeometries
+        val polygon_array = Array(count){i -> multipolygon.getGeometryN(i) as org.locationtech.jts.geom.Polygon}
+        add_polygon_array_to_map(polygon_array)
+    }
+
+
+    private fun add_polygon_array_to_map(polygon_array : Array<org.locationtech.jts.geom.Polygon>) {
+        for (p in polygon_array) {
+            add_polygon_to_map(p)
+        }
     }
 
 

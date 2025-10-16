@@ -12,27 +12,23 @@ public class Radar implements Question {
     public QuestionType type = QuestionType.RADAR;
 
     // статусы вопроса
-    public boolean answered;
+    public boolean answered = false;
 
     // входные пааремтры
-    public double radius; // радиус в километрах
-    public double lon; // центральная точка (x)
-    public double lat; // центральная точка (y)
+    public double radius = 0.0; // радиус в километрах
+    public double lon = 0.0; // центральная точка (x)
+    public double lat = 0.0; // центральная точка (y)
 
     // результат
     public Polygon area = null;
     public boolean is_inside = true;
 
     // private
-    private GeometryFactory GF;
+    private GeometryFactory GF = new GeometryFactory();
 
 
 
     public Radar (double x, double y, double radius) {
-        GF = new GeometryFactory();
-
-        answered = false;
-
         this.lon = x;
         this.lat = y;
         this.radius = radius;

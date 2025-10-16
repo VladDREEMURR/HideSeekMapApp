@@ -11,12 +11,12 @@ public class Thermometer implements Question {
     public QuestionType type = QuestionType.THERMOMETER;
 
     // статусы вопроса
-    public boolean answered;
+    public boolean answered = false;
 
     // входные параметры
-    public Envelope bounding_box;
-    public Point start_point;
-    public Point end_point;
+    public Envelope bounding_box = null;
+    public Point start_point = null;
+    public Point end_point = null;
 
     // результат
     public Polygon colder_area = null;
@@ -25,15 +25,11 @@ public class Thermometer implements Question {
     public Polygon[] polygons;
 
     // private
-    private GeometryFactory GF;
+    private GeometryFactory GF = new GeometryFactory();
 
 
 
     public Thermometer (Geometry input_area, double start_x, double start_y, double end_x, double end_y) {
-        GF = new GeometryFactory();
-
-        answered = false;
-
         bounding_box = input_area.getEnvelopeInternal();
         start_point = GF.createPoint(new Coordinate(start_x, start_y));
         end_point = GF.createPoint(new Coordinate(end_x, end_y));
