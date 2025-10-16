@@ -171,7 +171,7 @@ class MainActivity : ComponentActivity() {
             strokeWidth = 1.0f
             strokeColor = ContextCompat.getColor(this@MainActivity, R.color.red_dark)
             fillColor = Color.argb(
-                20,
+                40,
                 3, 218, 197
             )
         }
@@ -211,7 +211,7 @@ class MainActivity : ComponentActivity() {
                 Point(bounding_box.maxY, bounding_box.maxX)
             )
             var camera_pos = map_view.map.cameraPosition(Geometry.fromBoundingBox(map_bounding))
-            camera_pos = CameraPosition(camera_pos.target, camera_pos.zoom - 0.8f, camera_pos.azimuth, camera_pos.tilt)
+            camera_pos = CameraPosition(camera_pos.target, camera_pos.zoom + 0.8f, camera_pos.azimuth, camera_pos.tilt)
             map_view.map.move(
                 camera_pos,
                 Animation(Animation.Type.SMOOTH, 1.0f),

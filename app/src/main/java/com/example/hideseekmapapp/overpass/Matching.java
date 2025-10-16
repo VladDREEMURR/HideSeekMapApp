@@ -114,6 +114,7 @@ public class Matching implements Question {
 //            Polygon[] polygons;
             Point[] pts = point_storage.values().toArray(new Point[point_storage.values().size()]);
             Envelope bbox = GF.createMultiPoint(pts).getEnvelopeInternal();
+            bbox.expandBy(0.02);
             MapVoronoiCreator mvc = new MapVoronoiCreator(bbox, pts);
             polygons = mvc.polygons;
 
