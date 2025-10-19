@@ -14,6 +14,7 @@ import android.graphics.Color
 import androidx.core.content.ContextCompat
 import com.example.hideseekmapapp.overpass.Matching
 import com.example.hideseekmapapp.overpass.OverpassQueries
+import com.example.hideseekmapapp.overpass.PolygonBool
 
 import com.example.hideseekmapapp.overpass.Radar
 import com.example.hideseekmapapp.overpass.Thermometer
@@ -62,6 +63,8 @@ class MainActivity : ComponentActivity() {
     private lateinit var point_array : Array<org.locationtech.jts.geom.Point>
 
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -75,8 +78,10 @@ class MainActivity : ComponentActivity() {
         // блок тестового вывода
         test_output_block = findViewById(R.id.test_output)
 
+        val query = OverpassQueries.DISTRICT
+
         // some code
-        point_array = overpass_processor.testOverpass()
+        point_array = overpass_processor.testOverpass(query)
         for (p in point_array) {
             add_point_to_map(p)
         }
@@ -92,9 +97,10 @@ class MainActivity : ComponentActivity() {
             var start_y = 55.74
             var end_x = 37.66
             var end_y = 55.76
-//        var thermo : Thermometer = Thermometer(rad.area, start_x, start_y, end_x, end_y)
-            var matching : Matching = Matching(OverpassQueries.TRAIN_TERMINAL)
+//            var thermo : Thermometer = Thermometer(rad.area, start_x, start_y, end_x, end_y)
+            var matching : Matching = Matching(query)
 
+            /*
             var i = 0;
             while (i < matching.polygons.size) {
                 if (matching.polygons[i] == null) {
@@ -102,20 +108,23 @@ class MainActivity : ComponentActivity() {
                 }
                 i += 1
             }
+             */
 
-            remaining_area = org.locationtech.jts.geom.MultiPolygon(matching.polygons, org.locationtech.jts.geom.GeometryFactory())
-//        draw_remaining_area()
-            /*
+//            remaining_area = org.locationtech.jts.geom.MultiPolygon(matching.polygons, org.locationtech.jts.geom.GeometryFactory())
+            remaining_area = matching.variants.values.first()
+
             for (multipolygon in matching.variants.values) {
                 add_multipolygon_to_map(multipolygon)
             }
-            */
-            add_polygon_array_to_map(matching.polygons)
+
         } catch (e : Exception) {
             val s : String = e.stackTraceToString()
+            test_output_block.text = s;
         }
 
     }
+
+
 
 
     override fun onStart() {
@@ -125,6 +134,8 @@ class MainActivity : ComponentActivity() {
     }
 
 
+
+
     override fun onStop() {
         super.onStop()
         MapKitFactory.getInstance().onStop()
@@ -132,9 +143,13 @@ class MainActivity : ComponentActivity() {
     }
 
 
+
+
     private fun unite_polygon_with_remaining(polygon : org.locationtech.jts.geom.Polygon) {
         // TODO: доделать объединение с областью поиска
     }
+
+
 
 
     private fun draw_remaining_area() {
@@ -142,10 +157,14 @@ class MainActivity : ComponentActivity() {
     }
 
 
+
+
     private fun add_point_to_map(point : org.locationtech.jts.geom.Point) {
         val map_p = Point(point.y, point.x)
         val placemark : PlacemarkMapObject = map_view.map.mapObjects.addPlacemark(map_p)
     }
+
+
 
 
     private fun add_multipolygon_to_map(multipolygon : org.locationtech.jts.geom.MultiPolygon) {
@@ -155,6 +174,8 @@ class MainActivity : ComponentActivity() {
     }
 
 
+
+
     private fun add_polygon_array_to_map(polygon_array : Array<org.locationtech.jts.geom.Polygon>) {
         for (p in polygon_array) {
             add_polygon_to_map(p)
@@ -162,11 +183,27 @@ class MainActivity : ComponentActivity() {
     }
 
 
+
+
     private fun add_polygon_to_map(polygon : org.locationtech.jts.geom.Polygon) {
+        fun ring_to_point_arr (ring : org.locationtech.jts.geom.LinearRing) : List<Point> {
+            return ring.coordinates.map { Point(it.y, it.x) }
+        }
         // TODO: учитывать внутренние границы геометрии
-        val mapLinRing : LinearRing = LinearRing(polygon.exteriorRing.coordinates.map { Point(it.y, it.x) })
-        val mapPolygon : Polygon = Polygon(mapLinRing, emptyList<LinearRing>())
-        var map_obj : PolygonMapObject = map_view.map.mapObjects.addPolygon(mapPolygon)
+        // outer
+        val map_outer_ring : LinearRing = LinearRing(ring_to_point_arr(polygon.exteriorRing))
+
+        // inner
+        val map_inner_ring_arr = mutableListOf<LinearRing>()
+        for (i in 0 until polygon.numInteriorRing) {
+            val inner_ring = polygon.getInteriorRingN(i) as org.locationtech.jts.geom.LinearRing
+            val map_inner_ring = LinearRing(ring_to_point_arr(inner_ring))
+            map_inner_ring_arr.add(map_inner_ring)
+        }
+
+        // form polygon
+        val map_polygon : Polygon = Polygon(map_outer_ring, map_inner_ring_arr)
+        var map_obj : PolygonMapObject = map_view.map.mapObjects.addPolygon(map_polygon)
         map_obj.apply {
             strokeWidth = 1.0f
             strokeColor = ContextCompat.getColor(this@MainActivity, R.color.red_dark)
@@ -178,9 +215,13 @@ class MainActivity : ComponentActivity() {
     }
 
 
+
+
     private fun clear_map() {
         map_view.map.mapObjects.clear()
     }
+
+
 
 
     private fun prepare_interface() {
@@ -194,6 +235,7 @@ class MainActivity : ComponentActivity() {
         layout_questions = findViewById(R.id.questions_layout)
         layout_settings = findViewById(R.id.settings_layout)
 
+
         // события клика на кнопки
         button_orientation_north.setOnClickListener { // ориентация на север
             val current_map_position = map_view.map.cameraPosition.target
@@ -204,6 +246,7 @@ class MainActivity : ComponentActivity() {
                 null
             )
         }
+
         button_zoom_area.setOnClickListener { // зум по области
             val bounding_box : org.locationtech.jts.geom.Envelope = remaining_area.envelopeInternal
             val map_bounding = BoundingBox(
@@ -211,13 +254,14 @@ class MainActivity : ComponentActivity() {
                 Point(bounding_box.maxY, bounding_box.maxX)
             )
             var camera_pos = map_view.map.cameraPosition(Geometry.fromBoundingBox(map_bounding))
-            camera_pos = CameraPosition(camera_pos.target, camera_pos.zoom + 0.8f, camera_pos.azimuth, camera_pos.tilt)
+            camera_pos = CameraPosition(camera_pos.target, camera_pos.zoom + 0.5f, camera_pos.azimuth, camera_pos.tilt)
             map_view.map.move(
                 camera_pos,
                 Animation(Animation.Type.SMOOTH, 1.0f),
                 null
             )
         }
+
         button_questions.setOnClickListener {
             if (questons_shown) {
                 questons_shown = false
@@ -227,6 +271,7 @@ class MainActivity : ComponentActivity() {
             }
             refresh_layout_weights()
         }
+
         button_settings.setOnClickListener {
             if (settings_shown) {
                 settings_shown = false
@@ -237,9 +282,12 @@ class MainActivity : ComponentActivity() {
             refresh_layout_weights()
         }
 
+
         // обновить весы высот интерфейса
         refresh_layout_weights()
     }
+
+
 
 
     private fun refresh_layout_weights() {

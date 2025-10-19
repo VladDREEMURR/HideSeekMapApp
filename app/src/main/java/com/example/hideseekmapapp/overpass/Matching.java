@@ -6,6 +6,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
@@ -14,6 +15,7 @@ import org.locationtech.jts.operation.polygonize.Polygonizer;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -111,28 +113,11 @@ public class Matching implements Question {
     @Override
     public void create_areas() {
         if (get_answer_set_type() == AnswerSetType.VORONOI) {
-//            Polygon[] polygons;
             Point[] pts = point_storage.values().toArray(new Point[point_storage.values().size()]);
             Envelope bbox = GF.createMultiPoint(pts).getEnvelopeInternal();
             bbox.expandBy(0.02);
             MapVoronoiCreator mvc = new MapVoronoiCreator(bbox, pts);
             polygons = mvc.polygons;
-
-
-            try {
-                /*
-                int i = 0;
-                for (Long p_id : point_storage.keySet()) {
-                    variants.putIfAbsent(p_id, new MultiPolygon(new Polygon[]{polygons[i]}, GF));
-                    i = i + 1;
-                }
-                */
-            } catch (Exception e) {
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                e.printStackTrace(pw);
-                String s = sw.toString();
-            }
         }
     }
 
@@ -166,20 +151,23 @@ public class Matching implements Question {
 
         @Override
         public void handle(@NonNull Relation relation, @NonNull BoundingBox bounds, @NonNull Map<Long, LatLon> nodeGeometries, @NonNull Map<Long, List<LatLon>> wayGeometries) {
-            ArrayList<Point> pts = new ArrayList<>();
+            LinearRing[] rings = new LinearRing[wayGeometries.values().size()];
 
-            for (List<LatLon> way : wayGeometries.values()) {
-                for (LatLon ll : way) {
-                    pts.add(GF.createPoint(new Coordinate(
-                            ll.getLongitude(), ll.getLatitude()
-                    )));
+            // получить кольца геометрий
+            for (int w = 0; w < wayGeometries.values().size(); w++) {
+                List<LatLon> way = wayGeometries.get(w);
+                // составить кольцо из точек
+                Coordinate[] pts = new Coordinate[way.size() + 1];
+                for (int p = 0; p < way.size(); p++) {
+                    pts[p] = new Coordinate(way.get(p).getLongitude(), way.get(p).getLatitude());
                 }
+                pts[way.size()] = new Coordinate(way.get(0).getLongitude(), way.get(0).getLatitude());
+                rings[w] = GF.createLinearRing(pts);
             }
 
-            Point[] point_arr = new Point[pts.size()];
-            Geometry g = GF.createMultiPoint(point_arr);
+            // TODO: проблема со считыванием областей, разберись
             Polygonizer polygonizer = new Polygonizer();
-            polygonizer.add(g);
+            polygonizer.add(Arrays.asList(rings));
             Collection coll = polygonizer.getPolygons();
             MultiPolygon mp = new MultiPolygon(GF.toPolygonArray(coll), GF);
 

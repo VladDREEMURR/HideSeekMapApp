@@ -51,12 +51,12 @@ public class OverpassProcessor {
 
 
 
-    public Point[] testOverpass() {
+    public Point[] testOverpass(String query) {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    overpass.queryElementsWithGeometry(OverpassQueries.TRAIN_TERMINAL, geom_handler);
+                    overpass.queryElementsWithGeometry(query, geom_handler);
                 } catch (Exception e) {
                     StringWriter sw = new StringWriter();
                     PrintWriter pw = new PrintWriter(sw);

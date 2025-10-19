@@ -63,14 +63,14 @@ dependencies {
     // яндекс карты
     implementation(libs.maps.mobile)
 
-    // полигоны вороного
-    implementation(libs.voronoikotlin)
-
     // запросы в overpass
     implementation("de.westnordost:osmapi-overpass:3.0")
 
-    // булевы операции с мультиполигонами
+    // манипуляция геометрией
     implementation("org.locationtech.jts:jts-core:1.20.0")
+
+    // булевы операции над полигонами
+    implementation("com.menecats:polybool-java:1.0.1")
 
     // адаптация некоторых функций turf (JAVA)
     implementation("com.mapbox.mapboxsdk:mapbox-sdk-geojson:7.7.0")

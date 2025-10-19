@@ -6,15 +6,13 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.geom.prep.PreparedPolygon;
 import org.locationtech.jts.operation.polygonize.Polygonizer;
 import org.locationtech.jts.triangulate.VoronoiDiagramBuilder;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 public class MapVoronoiCreator {
     // входные параметры
@@ -56,7 +54,6 @@ public class MapVoronoiCreator {
     private void convert_polygons_to_map_coords (Polygon[] polygon_array) {
         Coordinate[] coords;
         polygons = new Polygon[polygon_array.length];
-        Geometry[] garr = new Geometry[polygon_array.length];
 
         for (int i = 0; i < polygon_array.length; i++) {
             coords = polygon_array[i].getCoordinates();
@@ -69,50 +66,45 @@ public class MapVoronoiCreator {
             polygons[i] = GF.createPolygon(coords);
         }
 
+        /*
         Polygonizer polygonizer = new Polygonizer(true);
         polygonizer.add(Arrays.asList(polygons));
         Collection coll = polygonizer.getPolygons();
         polygons = new Polygon[coll.size()];
         coll.toArray(polygons);
+
+         */
     }
 
 
 
     private Polygon[] create_polygons () {
-        try {
-            // построение диаграммы
-            VoronoiDiagramBuilder VDB = new VoronoiDiagramBuilder();
-            VDB.setClipEnvelope(bounding_box);
-            VDB.setSites(GF.createMultiPoint(points));
-            Geometry diag = VDB.getDiagram(GF);
+        // построение диаграммы
+        VoronoiDiagramBuilder VDB = new VoronoiDiagramBuilder();
+        VDB.setClipEnvelope(bounding_box);
+        VDB.setSites(GF.createMultiPoint(points));
+        Geometry diag = VDB.getDiagram(GF);
 
-            // делаем полигоны
-            Polygonizer polygonizer = new Polygonizer(true);
-            polygonizer.add(diag);
-            Collection coll = polygonizer.getPolygons();
-            Polygon[] polygon_arr = new Polygon[coll.size()];
-            coll.toArray(polygon_arr);
+        // делаем полигоны
+        Polygonizer polygonizer = new Polygonizer(true);
+        polygonizer.add(diag);
+        Collection coll = polygonizer.getPolygons();
+        Polygon[] polygon_arr = new Polygon[coll.size()];
+        coll.toArray(polygon_arr);
 
-            // если полигонов меньше, чем точек, надо доделать оставшиеся полигоны
-            if (polygon_arr.length < points.length) {
-                Point[] uncovered_points = get_uncovered_points(polygon_arr);
-                Polygon[] additional_polygons = get_uncovered_areas(polygon_arr, uncovered_points);
-                ArrayList<Polygon> polygonArrayList = new ArrayList<>(Arrays.asList(polygon_arr));
-                for (Polygon p : additional_polygons) {
-                    polygonArrayList.add(p);
-                }
-                polygon_arr = new Polygon[polygonArrayList.size()];
-                polygonArrayList.toArray(polygon_arr);
+        // если полигонов меньше, чем точек, надо доделать оставшиеся полигоны
+        while (polygon_arr.length < points.length) {
+            Point[] uncovered_points = get_uncovered_points(polygon_arr);
+            Polygon[] additional_polygons = get_uncovered_areas(polygon_arr, uncovered_points);
+            ArrayList<Polygon> polygonArrayList = new ArrayList<>(Arrays.asList(polygon_arr));
+            for (Polygon p : additional_polygons) {
+                polygonArrayList.add(p);
             }
-
-            return polygon_arr;
-        } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            String s = sw.toString();
+            polygon_arr = new Polygon[polygonArrayList.size()];
+            polygonArrayList.toArray(polygon_arr);
         }
-        return new Polygon[0];
+
+        return polygon_arr;
     }
 
 
@@ -120,12 +112,11 @@ public class MapVoronoiCreator {
     private Point[] get_uncovered_points (Polygon[] formed_polygons) {
         ArrayList<Point> uncovered_points = new ArrayList<>();
 
+        PreparedPolygon PP = new PreparedPolygon(GF.createMultiPolygon(formed_polygons));
+
         for (Point point : points) {
-            for (Polygon polygon : formed_polygons) {
-                if (polygon.covers(point)) {
-                    uncovered_points.add(point);
-                    break;
-                }
+            if (!PP.covers(point)) {
+                uncovered_points.add(point);
             }
         }
 
@@ -150,22 +141,16 @@ public class MapVoronoiCreator {
         Polygon[] missing_polygons = new Polygon[coll.size()];
         coll.toArray(missing_polygons);
 
-        // вычитаем из них сформированные
-        Geometry[] cut_polygs = new Geometry[missing_polygons.length];
+        // объединим уже сформированное для вычитания
+        PolygonBool PB = new PolygonBool(formed_polygons[0], Arrays.copyOfRange(formed_polygons, 1, formed_polygons.length), PolygonBoolOperationType.UNION);
+        Polygon[] combined_formed = PB.polygons;
+
+        // вычесть из новых полигонов все правильные
         for (int i = 0; i < missing_polygons.length; i++) {
-            Geometry g = missing_polygons[i].copy();
-            for (Polygon minus : formed_polygons) {
-                g = g.difference(minus);
-            }
-            cut_polygs[i] = g;
+            PB = new PolygonBool(missing_polygons[i], combined_formed, PolygonBoolOperationType.DIFFERENCE);
+            missing_polygons[i] = PB.polygons[0];
         }
 
-        // вычтенные преобразовываем в полигоны
-        polygonizer = new Polygonizer(true);
-        polygonizer.add(Arrays.asList(cut_polygs));
-        coll = polygonizer.getPolygons();
-        missing_polygons = new Polygon[coll.size()];
-        coll.toArray(missing_polygons);
         return missing_polygons;
     }
 }
