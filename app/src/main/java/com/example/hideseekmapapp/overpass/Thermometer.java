@@ -72,10 +72,6 @@ public class Thermometer implements Question {
     @Override
     public void generate_answer(double x, double y) {
         Point p = GF.createPoint(new Coordinate(x, y));
-        if (hotter_area.covers(p)) {
-            hotter = true;
-        } else {
-            hotter = false;
-        }
+        set_answer(hotter_area.covers(p));
     }
 }

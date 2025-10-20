@@ -71,6 +71,6 @@ public class Radar implements Question {
     @Override
     public void generate_answer(double x, double y) {
         Point p = GF.createPoint(new Coordinate(x, y));
-        is_inside = area.covers(p);
+        set_answer(area.covers(p));
     }
 }

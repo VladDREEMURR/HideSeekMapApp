@@ -6,7 +6,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LinearRing;
+import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
@@ -30,8 +30,6 @@ import de.westnordost.osmapi.map.data.Way;
 import de.westnordost.osmapi.overpass.MapDataWithGeometryHandler;
 import de.westnordost.osmapi.overpass.OverpassMapDataApi;
 
-// TODO: полная реализация Matching вопросов
-
 public class Matching implements Question {
     public final QuestionType type = QuestionType.MATCHING;
 
@@ -53,8 +51,8 @@ public class Matching implements Question {
     private GeometryFactory GF = new GeometryFactory();
     private HashMap<Long, Point> point_storage = new HashMap<>();
 
-    // test
-    public Polygon[] polygons;
+
+
 
 
     public Matching (String overpass_query) {
@@ -66,6 +64,8 @@ public class Matching implements Question {
 
 
 
+
+
     // делаем выводы после получения ответа
     public void set_answer (Long answer_id) {
         id_of_interest = answer_id;
@@ -73,6 +73,8 @@ public class Matching implements Question {
         area_name = names.get(id_of_interest);
         answered = true;
     }
+
+
 
 
 
@@ -110,23 +112,46 @@ public class Matching implements Question {
 
 
 
+
+
     @Override
     public void create_areas() {
         if (get_answer_set_type() == AnswerSetType.VORONOI) {
+            // создаём полигоны
             Point[] pts = point_storage.values().toArray(new Point[point_storage.values().size()]);
             Envelope bbox = GF.createMultiPoint(pts).getEnvelopeInternal();
             bbox.expandBy(0.02);
             MapVoronoiCreator mvc = new MapVoronoiCreator(bbox, pts);
-            polygons = mvc.polygons;
+            Polygon[] polygons = mvc.polygons;
+
+            // в нормальном случае одной точке соответствует одна область
+            // заполняем словарь мультиполигонов, проверяя точки на вхождение
+            for (int p = 0; p < polygons.length; p++) {
+                for (Long ID : point_storage.keySet()) {
+                    Point dot = point_storage.get(ID);
+                    if (polygons[p].covers(dot)) {
+                        variants.putIfAbsent(ID, new MultiPolygon(new Polygon[]{polygons[p]}, GF));
+                    }
+                }
+            }
         }
     }
 
 
 
+
+
     @Override
     public void generate_answer(double x, double y) {
-
+        Point p = GF.createPoint(new Coordinate(x, y));
+        for (Long ID : variants.keySet()) {
+            if (variants.get(ID).covers(p)) {
+                set_answer(ID);
+            }
+        }
     }
+
+
 
 
 
@@ -137,6 +162,8 @@ public class Matching implements Question {
             return AnswerSetType.VORONOI;
         }
     }
+
+
 
 
 
@@ -151,23 +178,23 @@ public class Matching implements Question {
 
         @Override
         public void handle(@NonNull Relation relation, @NonNull BoundingBox bounds, @NonNull Map<Long, LatLon> nodeGeometries, @NonNull Map<Long, List<LatLon>> wayGeometries) {
-            LinearRing[] rings = new LinearRing[wayGeometries.values().size()];
+            LineString[] lines = new LineString[wayGeometries.size()];
 
-            // получить кольца геометрий
-            for (int w = 0; w < wayGeometries.values().size(); w++) {
-                List<LatLon> way = wayGeometries.get(w);
-                // составить кольцо из точек
-                Coordinate[] pts = new Coordinate[way.size() + 1];
-                for (int p = 0; p < way.size(); p++) {
-                    pts[p] = new Coordinate(way.get(p).getLongitude(), way.get(p).getLatitude());
+            int i = 0;
+            for (List<LatLon> way : wayGeometries.values()) {
+                int j = 0;
+                Coordinate[] coords = new Coordinate[way.size()];
+                for (LatLon ll : way) {
+                    coords[j] = new Coordinate(ll.getLongitude(), ll.getLatitude());
+                    j += 1;
                 }
-                pts[way.size()] = new Coordinate(way.get(0).getLongitude(), way.get(0).getLatitude());
-                rings[w] = GF.createLinearRing(pts);
+                lines[i] = GF.createLineString(coords);
+                i += 1;
             }
 
             // TODO: проблема со считыванием областей, разберись
             Polygonizer polygonizer = new Polygonizer();
-            polygonizer.add(Arrays.asList(rings));
+            polygonizer.add(Arrays.asList(lines));
             Collection coll = polygonizer.getPolygons();
             MultiPolygon mp = new MultiPolygon(GF.toPolygonArray(coll), GF);
 
@@ -175,6 +202,8 @@ public class Matching implements Question {
             names.putIfAbsent(relation.getId(), relation.getTags().getOrDefault("name", "---"));
         }
     };
+
+
 
 
 
