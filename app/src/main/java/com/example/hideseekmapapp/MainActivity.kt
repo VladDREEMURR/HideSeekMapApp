@@ -84,7 +84,7 @@ class MainActivity : ComponentActivity() {
         // блок тестового вывода
         test_output_block = findViewById(R.id.test_output)
 
-        val query = OverpassQueries.LIBRARY
+        val query = OverpassQueries.COMMERCIAL_AIRPORT
 
         // some code
         point_array = overpass_processor.testOverpass(query)

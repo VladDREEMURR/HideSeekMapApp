@@ -1,3 +1,33 @@
 <resources>
     <string name="app_name">HideSeekMapApp</string>
+
+<!--    Названия категорий вопросов-->
+    <string name="question_name_matching">Совпадение</string>
+    <string name="question_name_measuring">Сравнение</string>
+    <string name="question_name_radar">Радар</string>
+    <string name="question_name_tentacles">Тентакли</string>
+    <string name="question_name_thermometer">Термометр</string>
+
+<!--    Тексты для кнопок-->
+    <string name="button_label_create_and_show_areas">Создать и показать \n области</string>
+    <string name="button_label_create_and_show_objects">Создать и показать \n объекты</string>
+<!--    <string name="button_label_copy">Скопировать</string>-->
+    <string name="button_label_generate_answer">Сгенерировать ответ</string>
+    <string name="button_label_apply_answer">Применить ответ</string>
+    <string name="button_label_hide">Свернуть</string>
+    <string name="button_label_show">Развернуть</string>
+    <string name="button_label_delete_question">Удалить вопрос</string>
+
+<!--    Текстовые labels-->
+    <string name="text_label_point_coords">Твоё местоположение</string>
+    <string name="text_label_object_type">Тип объекта</string>
+    <string name="text_label_object_id">ID объекта</string>
+    <string name="text_label_distance">Дистанция (км)</string>
+    <string name="text_label_is_same">Совпадает?</string>
+    <string name="text_label_is_inside">Внутри?</string>
+    <string name="text_label_is_closer">Ближе?</string>
+    <string name="text_label_is_hotter">Горячее?</string>
+    <string name="text_label_answer_object_name">Название объекта \n (ответ)</string>
+    <string name="text_label_point_colder">Точка \"холодно\"</string>
+    <string name="text_label_point_hotter">Точка \"горячо\"</string>
 </resources>
