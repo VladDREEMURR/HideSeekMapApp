@@ -1,5 +1,7 @@
 package com.example.hideseekmapapp
 
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import com.example.hideseekmapapp.overpass.OverpassProcessor
 
 import android.os.Bundle
@@ -11,12 +13,15 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import android.graphics.Color
+import android.graphics.Paint
 import androidx.core.content.ContextCompat
 import com.example.hideseekmapapp.overpass.Matching
+import com.example.hideseekmapapp.overpass.Measuring
 import com.example.hideseekmapapp.overpass.OverpassQueries
 import com.example.hideseekmapapp.overpass.PolygonBool
 
 import com.example.hideseekmapapp.overpass.Radar
+import com.example.hideseekmapapp.overpass.Tentacles
 import com.example.hideseekmapapp.overpass.Thermometer
 
 import com.yandex.mapkit.Animation
@@ -30,6 +35,7 @@ import com.yandex.mapkit.geometry.LinearRing
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.map.PolygonMapObject
+import com.yandex.runtime.image.ImageProvider
 
 // TODO: сделать рабочей область вопросов и настроек (возможно, отребуются отдельные классы для управления этими категориями)
 // TODO: протестировать зарисовку областей на карте через OverpassProcessor
@@ -78,7 +84,7 @@ class MainActivity : ComponentActivity() {
         // блок тестового вывода
         test_output_block = findViewById(R.id.test_output)
 
-        val query = OverpassQueries.DISTRICT
+        val query = OverpassQueries.LIBRARY
 
         // some code
         point_array = overpass_processor.testOverpass(query)
@@ -92,13 +98,25 @@ class MainActivity : ComponentActivity() {
 //        add_polygon_to_map(rad.area)
 
         // пример использования термометра
+        var start_x = 37.490
+        var start_y = 55.746
+        var GF = org.locationtech.jts.geom.GeometryFactory()
+        val curr_point = GF.createPoint(org.locationtech.jts.geom.Coordinate(start_x, start_y))
+        add_colored_point_to_map(curr_point)
+
         try {
-            var start_x = 37.60
-            var start_y = 55.74
+
             var end_x = 37.66
             var end_y = 55.76
-//            var thermo : Thermometer = Thermometer(rad.area, start_x, start_y, end_x, end_y)
-            var matching : Matching = Matching(query)
+
+
+            var thermo : Thermometer = Thermometer(rad.area, start_x, start_y, end_x, end_y)
+            remaining_area = org.locationtech.jts.geom.MultiPolygon(arrayOf(thermo.hotter_area), GF)
+//            var matching : Matching = Matching(query)
+//            var tentacles : Tentacles = Tentacles(query, start_x, start_y, 1.0)
+            var measuring = Measuring(query, start_x, start_y, remaining_area.envelopeInternal)
+
+            add_polygon_to_map(thermo.hotter_area)
 
             /*
             var i = 0;
@@ -111,12 +129,16 @@ class MainActivity : ComponentActivity() {
              */
 
 //            remaining_area = org.locationtech.jts.geom.MultiPolygon(matching.polygons, org.locationtech.jts.geom.GeometryFactory())
-            remaining_area = matching.variants.values.first()
+//            remaining_area = tentacles.variants.values.first()
 
-            for (multipolygon in matching.variants.values) {
+            /*
+            for (multipolygon in tentacles.variants.values) {
                 add_multipolygon_to_map(multipolygon)
             }
-
+             */
+//            remaining_area = measuring.area
+//            draw_remaining_area()
+            add_multipolygon_to_map(measuring.area)
         } catch (e : Exception) {
             val s : String = e.stackTraceToString()
             test_output_block.text = s;
@@ -154,6 +176,24 @@ class MainActivity : ComponentActivity() {
 
     private fun draw_remaining_area() {
         add_multipolygon_to_map(remaining_area)
+    }
+
+
+
+
+    private fun add_colored_point_to_map(point : org.locationtech.jts.geom.Point) {
+        val map_p = Point(point.y, point.x)
+        val placemark : PlacemarkMapObject = map_view.map.mapObjects.addPlacemark(map_p)
+
+        val size = 20
+        val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        val paint = Paint().apply {
+            this.color = 0xFFFF0000.toInt()
+            isAntiAlias = true
+        }
+        canvas.drawCircle(size / 2f, size / 2f, size / 2f, paint)
+        placemark.setIcon(ImageProvider.fromBitmap(bitmap))
     }
 
 

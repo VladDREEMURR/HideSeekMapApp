@@ -6,9 +6,14 @@ import com.menecats.polybool.Epsilon;
 
 import static com.menecats.polybool.helpers.PolyBoolHelper.*;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class PolygonBool {
     // участники операции
@@ -18,7 +23,7 @@ public class PolygonBool {
     public org.locationtech.jts.geom.Polygon[] polygons;
 
     // для процесса операций
-    private Epsilon eps = epsilon();
+    private Epsilon eps = epsilon(1e-12);
 
 
 
@@ -28,10 +33,68 @@ public class PolygonBool {
 
         PolyBool.Segments seg_res = PolyBool.segments(eps, result);
 
+        int threads_num = 4;
+        int chunk_size = polygons.length / threads_num;
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+        PolyBool.Segments[] seg_opers = new PolyBool.Segments[threads_num];
+
+        for (int t = 0; t < threads_num; t++) {
+            final int start = t * chunk_size;
+            final int end = (t == threads_num - 1) ? polygons.length : start + chunk_size;
+            final int seg_id = t;
+
+            executor.submit(new Runnable() {
+                @Override
+                public void run() {
+                    seg_opers[seg_id] = PolyBool.segments(eps, jts_to_polybool(polygons[start]));
+                    for (int i = start + 1; i < end; i++) {
+                        PolyBool.Segments newseg = PolyBool.segments(eps, jts_to_polybool(polygons[i]));
+                        PolyBool.Combined combination = PolyBool.combine(eps, seg_opers[seg_id], newseg);
+                        switch (operation_type) {
+                            case UNION: case DIFFERENCE:
+                                seg_opers[seg_id] = PolyBool.selectUnion(combination);
+                                break;
+                            case INTERSECTION:
+                                seg_opers[seg_id] = PolyBool.selectIntersect(combination);
+                                break;
+                        }
+                    }
+                }
+            });
+        }
+
+        executor.shutdown();
+        try {
+            executor.awaitTermination(30, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            String s = sw.toString();
+        }
+
         // выполнить операции
+        /*
         for (int i = 0; i < polygons.length; i++) {
             PolyBool.Segments seg_oper = PolyBool.segments(eps, jts_to_polybool(polygons[i]));
             PolyBool.Combined combination = PolyBool.combine(eps, seg_res, seg_oper);
+            switch (operation_type) {
+                case UNION:
+                    seg_res = PolyBool.selectUnion(combination);
+                    break;
+                case DIFFERENCE:
+                    seg_res = PolyBool.selectDifference(combination);
+                    break;
+                case INTERSECTION:
+                    seg_res = PolyBool.selectIntersect(combination);
+                    break;
+            }
+        }
+         */
+
+        for (int i = 0; i < threads_num; i++) {
+
+            PolyBool.Combined combination = PolyBool.combine(eps, seg_res, seg_opers[i]);
             switch (operation_type) {
                 case UNION:
                     seg_res = PolyBool.selectUnion(combination);

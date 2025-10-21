@@ -38,7 +38,6 @@ public class Matching implements Question {
 
     // входные данные
     public String overpass_query = ""; // какой именно вопрос совпадения мы задаём
-    public Long object_id = 0L; // объект, который мы ищем
 
     // результаты
     public HashMap<Long, String> names = new HashMap<>(); // названия вариантов ответа
@@ -46,6 +45,7 @@ public class Matching implements Question {
     public Long id_of_interest = 0L; // ключ к Map, подходящий объект
     public MultiPolygon area = null; // результирующая область (мульти может быть из-за проверки на принадлежность району)
     public String area_name = ""; // название варианта
+    public boolean is_inside = false;
 
     // private
     private GeometryFactory GF = new GeometryFactory();
@@ -67,8 +67,9 @@ public class Matching implements Question {
 
 
     // делаем выводы после получения ответа
-    public void set_answer (Long answer_id) {
+    public void set_answer (Long answer_id, boolean is_inside) {
         id_of_interest = answer_id;
+        this.is_inside = is_inside;
         area = variants.get(id_of_interest);
         area_name = names.get(id_of_interest);
         answered = true;
@@ -146,7 +147,8 @@ public class Matching implements Question {
         Point p = GF.createPoint(new Coordinate(x, y));
         for (Long ID : variants.keySet()) {
             if (variants.get(ID).covers(p)) {
-                set_answer(ID);
+                set_answer(ID, true);
+                break;
             }
         }
     }
