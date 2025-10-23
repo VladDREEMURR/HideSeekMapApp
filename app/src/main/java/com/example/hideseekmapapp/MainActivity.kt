@@ -14,6 +14,7 @@ import android.widget.TextView
 import androidx.activity.ComponentActivity
 import android.graphics.Color
 import android.graphics.Paint
+import android.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import com.example.hideseekmapapp.overpass.Matching
 import com.example.hideseekmapapp.overpass.Measuring
@@ -38,8 +39,6 @@ import com.yandex.mapkit.map.PolygonMapObject
 import com.yandex.runtime.image.ImageProvider
 
 // TODO: сделать рабочей область вопросов и настроек (возможно, отребуются отдельные классы для управления этими категориями)
-// TODO: протестировать зарисовку областей на карте через OverpassProcessor
-// TODO: сделать overpass запрос в отдельных файлах для каждого вопроса
 
 class MainActivity : ComponentActivity() {
     // режим приложения
@@ -51,6 +50,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var button_zoom_area : Button
     private lateinit var button_questions : Button
     private lateinit var button_settings : Button
+    private lateinit var button_new_question : Button
     private lateinit var layout_questions : LinearLayout
     private lateinit var layout_settings : GridLayout
 
@@ -229,7 +229,7 @@ class MainActivity : ComponentActivity() {
         fun ring_to_point_arr (ring : org.locationtech.jts.geom.LinearRing) : List<Point> {
             return ring.coordinates.map { Point(it.y, it.x) }
         }
-        // TODO: учитывать внутренние границы геометрии
+
         // outer
         val map_outer_ring : LinearRing = LinearRing(ring_to_point_arr(polygon.exteriorRing))
 
@@ -272,6 +272,7 @@ class MainActivity : ComponentActivity() {
         button_zoom_area = findViewById(R.id.zoom_area_button)
         button_questions = findViewById(R.id.toggle_questions_button)
         button_settings = findViewById(R.id.toggle_settings_button)
+        button_new_question = findViewById(R.id.new_question_button)
         layout_questions = findViewById(R.id.questions_layout)
         layout_settings = findViewById(R.id.settings_layout)
 
@@ -320,6 +321,37 @@ class MainActivity : ComponentActivity() {
                 settings_shown = true
             }
             refresh_layout_weights()
+        }
+        button_new_question.setOnClickListener { view ->
+            val popup_menu = PopupMenu(this, view)
+            popup_menu.inflate(R.menu.new_question_popup)
+
+            popup_menu.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.popup_new_matching -> {
+
+                        true
+                    }
+                    R.id.popup_new_measuring -> {
+
+                        true
+                    }
+                    R.id.popup_new_thermometer -> {
+
+                        true
+                    }
+                    R.id.popup_new_radar -> {
+
+                        true
+                    }
+                    R.id.popup_new_tentacles -> {
+
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popup_menu.show()
         }
 
 

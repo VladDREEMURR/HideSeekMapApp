@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/popup_new_matching" android:title="@string/question_name_matching"/>
+    <item android:id="@+id/popup_new_measuring" android:title="@string/question_name_measuring"/>
+    <item android:id="@+id/popup_new_thermometer" android:title="@string/question_name_thermometer"/>
+    <item android:id="@+id/popup_new_radar" android:title="@string/question_name_radar"/>
+    <item android:id="@+id/popup_new_tentacles" android:title="@string/question_name_tentacles"/>
+</menu>
