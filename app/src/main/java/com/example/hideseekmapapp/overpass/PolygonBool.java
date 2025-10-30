@@ -27,9 +27,14 @@ public class PolygonBool {
 
 
 
-    public PolygonBool (org.locationtech.jts.geom.Polygon target, org.locationtech.jts.geom.Polygon[] polygons, PolygonBoolOperationType operation_type) {
+    public PolygonBool (org.locationtech.jts.geom.MultiPolygon target, org.locationtech.jts.geom.Polygon[] polygons, PolygonBoolOperationType operation_type) {
 
-        result = jts_to_polybool(target);
+        result = jts_to_polybool(multijts_to_arrjts(target));
+
+        if (polygons.length <= 0) {
+            this.polygons = polybool_to_jts(result);
+            return;
+        }
 
         PolyBool.Segments seg_res = PolyBool.segments(eps, result);
 
@@ -46,9 +51,9 @@ public class PolygonBool {
             executor.submit(new Runnable() {
                 @Override
                 public void run() {
-                    seg_opers[seg_id] = PolyBool.segments(eps, jts_to_polybool(polygons[start]));
+                    seg_opers[seg_id] = PolyBool.segments(eps, jts_to_polybool(new org.locationtech.jts.geom.Polygon[]{polygons[start]}));
                     for (int i = start + 1; i < end; i++) {
-                        PolyBool.Segments newseg = PolyBool.segments(eps, jts_to_polybool(polygons[i]));
+                        PolyBool.Segments newseg = PolyBool.segments(eps, jts_to_polybool(new org.locationtech.jts.geom.Polygon[]{polygons[i]}));
                         PolyBool.Combined combination = PolyBool.combine(eps, seg_opers[seg_id], newseg);
                         switch (operation_type) {
                             case UNION: case DIFFERENCE:
@@ -73,27 +78,7 @@ public class PolygonBool {
             String s = sw.toString();
         }
 
-        // выполнить операции
-        /*
-        for (int i = 0; i < polygons.length; i++) {
-            PolyBool.Segments seg_oper = PolyBool.segments(eps, jts_to_polybool(polygons[i]));
-            PolyBool.Combined combination = PolyBool.combine(eps, seg_res, seg_oper);
-            switch (operation_type) {
-                case UNION:
-                    seg_res = PolyBool.selectUnion(combination);
-                    break;
-                case DIFFERENCE:
-                    seg_res = PolyBool.selectDifference(combination);
-                    break;
-                case INTERSECTION:
-                    seg_res = PolyBool.selectIntersect(combination);
-                    break;
-            }
-        }
-         */
-
         for (int i = 0; i < threads_num; i++) {
-
             PolyBool.Combined combination = PolyBool.combine(eps, seg_res, seg_opers[i]);
             switch (operation_type) {
                 case UNION:
@@ -115,24 +100,37 @@ public class PolygonBool {
 
 
 
-    private Polygon jts_to_polybool (org.locationtech.jts.geom.Polygon polygon) {
+    private org.locationtech.jts.geom.Polygon[] multijts_to_arrjts (org.locationtech.jts.geom.MultiPolygon multipolygon) {
+        org.locationtech.jts.operation.polygonize.Polygonizer polygonizer = new org.locationtech.jts.operation.polygonize.Polygonizer(true);
+        polygonizer.add(multipolygon);
+        Collection<org.locationtech.jts.geom.Polygon> coll = polygonizer.getPolygons();
+        org.locationtech.jts.geom.Polygon[] pols = new org.locationtech.jts.geom.Polygon[coll.size()];
+        coll.toArray(pols);
+        return pols;
+    }
+
+
+
+    private Polygon jts_to_polybool (org.locationtech.jts.geom.Polygon[] polygons) {
         ArrayList<List<double[]>> regions = new ArrayList<>();
         ArrayList<double[]> coords;
 
-        // outer
-        coords = new ArrayList<>();
-        for (org.locationtech.jts.geom.Coordinate c : polygon.getExteriorRing().getCoordinates()) {
-            coords.add(new double[]{c.x, c.y});
-        }
-        regions.add(coords);
-
-        // inner
-        for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
+        for (org.locationtech.jts.geom.Polygon polygon : polygons) {
+            // outer
             coords = new ArrayList<>();
-            for (org.locationtech.jts.geom.Coordinate c : polygon.getInteriorRingN(i).getCoordinates()) {
+            for (org.locationtech.jts.geom.Coordinate c : polygon.getExteriorRing().getCoordinates()) {
                 coords.add(new double[]{c.x, c.y});
             }
             regions.add(coords);
+
+            // inner
+            for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
+                coords = new ArrayList<>();
+                for (org.locationtech.jts.geom.Coordinate c : polygon.getInteriorRingN(i).getCoordinates()) {
+                    coords.add(new double[]{c.x, c.y});
+                }
+                regions.add(coords);
+            }
         }
         
         return new Polygon(regions);

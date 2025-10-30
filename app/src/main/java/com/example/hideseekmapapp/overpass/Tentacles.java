@@ -169,7 +169,7 @@ public class Tentacles implements Question {
                 // обрезать полигон по окружности (если надо обрезать)
                 Polygon pol = polygons[p];
                 if (!circle.covers(pol)) {
-                    PolygonBool PB = new PolygonBool(pol, new Polygon[]{circle}, PolygonBoolOperationType.INTERSECTION);
+                    PolygonBool PB = new PolygonBool(GF.createMultiPolygon(new Polygon[]{pol}), new Polygon[]{circle}, PolygonBoolOperationType.INTERSECTION);
                     pol = PB.polygons[0];
                 }
                 // положить полигон в словарь

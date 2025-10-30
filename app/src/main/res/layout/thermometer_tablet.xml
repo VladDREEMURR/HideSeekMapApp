@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
-    <GridLayout
+    <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:columnCount="2"
-        android:rowCount="10"
+        android:rowCount="7"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="5sp"
+        android:background="@color/ui_background_yellow"
         >
 
         <TextView
@@ -78,4 +79,3 @@
             android:text="@string/button_label_delete_question"
             />
     </GridLayout>
-</merge>

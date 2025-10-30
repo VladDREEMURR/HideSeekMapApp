@@ -142,12 +142,12 @@ public class MapVoronoiCreator {
         coll.toArray(missing_polygons);
 
         // объединим уже сформированное для вычитания
-        PolygonBool PB = new PolygonBool(formed_polygons[0], Arrays.copyOfRange(formed_polygons, 1, formed_polygons.length), PolygonBoolOperationType.UNION);
+        PolygonBool PB = new PolygonBool(GF.createMultiPolygon(new Polygon[]{formed_polygons[0]}), Arrays.copyOfRange(formed_polygons, 1, formed_polygons.length), PolygonBoolOperationType.UNION);
         Polygon[] combined_formed = PB.polygons;
 
         // вычесть из новых полигонов все правильные
         for (int i = 0; i < missing_polygons.length; i++) {
-            PB = new PolygonBool(missing_polygons[i], combined_formed, PolygonBoolOperationType.DIFFERENCE);
+            PB = new PolygonBool(GF.createMultiPolygon(new Polygon[]{missing_polygons[i]}), combined_formed, PolygonBoolOperationType.DIFFERENCE);
             missing_polygons[i] = PB.polygons[0];
         }
 

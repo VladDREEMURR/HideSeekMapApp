@@ -20,7 +20,7 @@
 
 <!--    Текстовые labels-->
     <string name="text_label_point_coords">Твоё местоположение</string>
-    <string name="text_label_object_type">Тип объекта</string>
+    <string name="text_label_object_type">Категория объектов</string>
     <string name="text_label_object_id">ID объекта</string>
     <string name="text_label_distance">Дистанция (км)</string>
     <string name="text_label_is_same">Совпадает?</string>

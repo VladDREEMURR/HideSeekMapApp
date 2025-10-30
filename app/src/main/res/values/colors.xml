@@ -4,4 +4,17 @@
     <color name="red_dark">#FFB30000</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="ui_background_teal">#8003DAC5</color>
+    <color name="ui_background_dark_red">#80B30000</color>
+    <color name="ui_background_yellow">#80FFEB36</color>
+
+    <color name="remaining_area_border">#FF0E8700</color>
+    <color name="remaining_area_background">#3015CF00</color>
+
+    <color name="question_areas_border">#FF7D5E00</color>
+    <color name="question_areas_background">#30FFEB36</color>
+
+    <color name="dot_location">#FF8B00A1</color>
+    <color name="dot_of_object">#FF2E00A1</color>
 </resources>

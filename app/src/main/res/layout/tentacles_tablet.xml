@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
-    <GridLayout
+    <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:columnCount="2"
-        android:rowCount="10"
+        android:rowCount="9"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="5sp"
+        android:background="@color/ui_background_yellow"
         >
 
         <TextView
@@ -64,6 +65,13 @@
             android:inputType="text"
             />
 
+        <Button
+            android:layout_gravity="fill_horizontal"
+            android:id="@+id/generate_answer_button"
+            android:layout_columnSpan="2"
+            android:text="@string/button_label_generate_answer"
+            />
+
         <TextView
             android:layout_gravity="fill_horizontal"
             android:textSize="16sp"
@@ -90,13 +98,6 @@
 
         <Button
             android:layout_gravity="fill_horizontal"
-            android:id="@+id/generate_answer_button"
-            android:layout_columnSpan="2"
-            android:text="@string/button_label_generate_answer"
-            />
-
-        <Button
-            android:layout_gravity="fill_horizontal"
             android:id="@+id/apply_answer_button"
             android:text="@string/button_label_apply_answer"
             />
@@ -107,4 +108,3 @@
             android:text="@string/button_label_delete_question"
             />
     </GridLayout>
-</merge>

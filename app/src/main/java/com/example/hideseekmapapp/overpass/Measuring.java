@@ -173,7 +173,7 @@ public class Measuring implements Question {
         }
 
         // объединяем круги
-        PolygonBool PB = new PolygonBool(polygons[0], Arrays.copyOfRange(polygons, 1, polygons.length), PolygonBoolOperationType.UNION);
+        PolygonBool PB = new PolygonBool(GF.createMultiPolygon(new Polygon[]{polygons[0]}), Arrays.copyOfRange(polygons, 1, polygons.length), PolygonBoolOperationType.UNION);
         area = GF.createMultiPolygon(PB.polygons);
     }
 
