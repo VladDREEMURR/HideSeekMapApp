@@ -1,7 +1,5 @@
 package com.example.hideseekmapapp.overpass;
 
-// TODO: полная реализация Measuring вопросов
-
 import androidx.annotation.NonNull;
 
 import org.locationtech.jts.geom.Coordinate;
@@ -61,9 +59,6 @@ public class Measuring implements Question {
         this.lat = lat;
         this.bbox = bbox;
         this.comparator_point = GF.createPoint(new Coordinate(lon, lat));
-
-        exec_overpass();
-        create_areas();
     }
 
 

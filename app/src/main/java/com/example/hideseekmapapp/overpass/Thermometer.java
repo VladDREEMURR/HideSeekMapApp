@@ -33,8 +33,6 @@ public class Thermometer implements Question {
         bounding_box = input_area.getEnvelopeInternal();
         start_point = GF.createPoint(new Coordinate(start_x, start_y));
         end_point = GF.createPoint(new Coordinate(end_x, end_y));
-
-        create_areas();
     }
 
 

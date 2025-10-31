@@ -1,7 +1,5 @@
 package com.example.hideseekmapapp.overpass;
 
-// TODO: полная реализация Tentacles вопросов
-
 import androidx.annotation.NonNull;
 
 import org.locationtech.jts.geom.Coordinate;
@@ -62,9 +60,6 @@ public class Tentacles implements Question {
         this.lon = x;
         this.lat = y;
         this.radius = radius;
-
-        exec_overpass();
-        create_areas();
     }
 
 

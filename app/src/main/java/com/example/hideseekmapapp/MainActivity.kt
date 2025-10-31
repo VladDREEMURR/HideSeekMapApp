@@ -1,6 +1,5 @@
 package com.example.hideseekmapapp
 
-import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.Canvas
 
@@ -12,19 +11,18 @@ import android.widget.GridLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.ComponentActivity
-import android.graphics.Color
 import android.graphics.Paint
-import android.view.LayoutInflater
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.PopupMenu
-import androidx.compose.ui.graphics.toArgb
+import android.widget.Spinner
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
+import com.example.hideseekmapapp.overpass.ObjectTypeQuestionSets
+import com.example.hideseekmapapp.overpass.ObjectTypeTranslator
 
-import com.example.hideseekmapapp.overpass.OverpassQueries
 import com.example.hideseekmapapp.overpass.Question
 import com.example.hideseekmapapp.overpass.QuestionType
 import com.example.hideseekmapapp.overpass.Radar
-import com.example.hideseekmapapp.overpass.Thermometer
 import com.example.hideseekmapapp.overpass.OverpassProcessor
 import com.example.hideseekmapapp.overpass.PolygonBool
 import com.example.hideseekmapapp.overpass.PolygonBoolOperationType
@@ -66,11 +64,12 @@ class MainActivity : ComponentActivity() {
     private lateinit var layout_question_block : LinearLayout
     private lateinit var layout_settings : GridLayout
 
-    // список вопросов
-    private var question_object_list : ArrayList<Question> = arrayListOf()
-    private var question_tablet_list : ArrayList<View> = arrayListOf()
-    private var question_label_list : ArrayList<LinearLayout> = arrayListOf()
-    private var question_id_list : ArrayList<String> = arrayListOf()
+    // списки для вопросов
+    private var question_object_list : MutableMap<String, Question> = mutableMapOf()
+    private var question_tablet_list : MutableMap<String, View> = mutableMapOf()
+    private var question_label_list : MutableMap<String, LinearLayout> = mutableMapOf()
+    private var question_type_list : MutableMap<Int, QuestionType> = mutableMapOf()
+    private var question_global_id : Int = 0
 
     // показываем ли элементы меню
     private var questons_shown : Boolean = false
@@ -105,38 +104,23 @@ class MainActivity : ComponentActivity() {
         test_output_block = findViewById(R.id.test_output)
 
         // some code
-
-        val query = OverpassQueries.COMMERCIAL_AIRPORT
-
-        point_array = overpass_processor.testOverpass(query)
-        for (p in point_array) {
-            add_point_to_map(p, ContextCompat.getColor(this@MainActivity, R.color.dot_of_object))
-        }
-
-        // пример использования радара
-        var rad = Radar(37.620, 55.754, 10.0)
-        rad.create_areas()
-
-        var start_x = 37.490
-        var start_y = 55.746
-        var GF = org.locationtech.jts.geom.GeometryFactory()
+        val start_x = 37.490
+        val start_y = 55.746
+        val end_x = 37.66
+        val end_y = 55.76
         val curr_point = GF.createPoint(org.locationtech.jts.geom.Coordinate(start_x, start_y))
+        val radar = Radar(start_x, start_y, 5.0)
+        radar.create_areas()
+        remaining_area = GF.createMultiPolygon(arrayOf(radar.area))
 
         add_point_to_map(curr_point, ContextCompat.getColor(this@MainActivity, R.color.dot_location))
+        draw_remaining_area()
 
         try {
-            var end_x = 37.66
-            var end_y = 55.76
-
-
-            var thermo = Thermometer(rad.area, start_x, start_y, end_x, end_y)
-            remaining_area = org.locationtech.jts.geom.MultiPolygon(arrayOf(thermo.hotter_area), GF)
-            draw_remaining_area()
         } catch (e : Exception) {
             val s : String = e.stackTraceToString()
             test_output_block.text = s;
         }
-
     }
 
 
@@ -402,10 +386,10 @@ class MainActivity : ComponentActivity() {
 
     // создание нового вопроса
     private fun create_new_question(question_type: QuestionType) {
-        val list_id = question_label_list.size
+        create_new_question_id_in_a_list(question_type, question_global_id)
+        create_new_question_tablet(question_type, question_global_id)
 
-        create_new_question_id_in_a_list(question_type, list_id)
-        create_new_question_tablet(question_type, list_id)
+        question_global_id += 1
     }
 
 
@@ -413,9 +397,9 @@ class MainActivity : ComponentActivity() {
 
     // создание нового tablet и его показ
     private fun create_new_question_tablet(question_type : QuestionType, list_id: Int) {
+        // получаем view
         val inflater = this.layoutInflater
         val layout_question_tablet : View
-
         when (question_type) {
             QuestionType.MATCHING -> {
                 layout_question_tablet = inflater.inflate(R.layout.matching_tablet, null, false)
@@ -438,12 +422,101 @@ class MainActivity : ComponentActivity() {
                 true
             }
         }
-
         layout_question_tablet.tag = list_id
-        question_tablet_list.add(layout_question_tablet)
-        layout_question_list.addView(layout_question_tablet)
 
-        // TODO: дать кнопкам функционал
+        val create_objects_button : Button = layout_question_tablet.findViewById<Button>(R.id.create_show_objects_button)
+        val create_areas_button : Button = layout_question_tablet.findViewById<Button>(R.id.create_show_areas_button)
+        val generate_answer_button : Button = layout_question_tablet.findViewById<Button>(R.id.generate_answer_button)
+        val apply_answer_button : Button = layout_question_tablet.findViewById<Button>(R.id.apply_answer_button)
+        val delete_question_button : Button = layout_question_tablet.findViewById<Button>(R.id.delete_question_button)
+        val object_type_spinner = layout_question_tablet.findViewById<Spinner>(R.id.object_type)
+        create_objects_button.isEnabled = false
+        create_areas_button.isEnabled = false
+        generate_answer_button.isEnabled = false
+        apply_answer_button.isEnabled = false
+
+        // даём кнопкам функционал
+        if (create_objects_button != null) { // создание объектов
+            create_objects_button.setOnClickListener { view ->
+                val id = (view.parent as View).tag.toString().toInt()
+                create_show_objects(question_type_list[id], id)
+            }
+        }
+        create_areas_button.setOnClickListener { view -> // создание областей
+            val id = (view.parent as View).tag.toString().toInt()
+            create_show_areas(question_type_list[id], id)
+        }
+        generate_answer_button.setOnClickListener { view -> // генерирование ответа
+            val id = (view.parent as View).tag.toString().toInt()
+            generate_answer(question_type_list[id], id)
+        }
+        apply_answer_button.setOnClickListener { view -> // применение ответа
+            val id = (view.parent as View).tag.toString().toInt()
+            apply_answer(question_type_list[id], id)
+        }
+        delete_question_button.setOnClickListener { view -> // удаление ответа
+            val id = (view.parent as View).tag.toString().toInt()
+            delete_question(id)
+        }
+
+        // даём спиннеру функционал
+        val translated_types = arrayListOf<String>()
+        var type_strings : Array<String> = arrayOf()
+        val adapter : ArrayAdapter<String>
+        when (question_type) {
+            QuestionType.MATCHING -> {
+                type_strings = ObjectTypeQuestionSets.matching
+                true
+            }
+            QuestionType.MEASURING -> {
+                type_strings = ObjectTypeQuestionSets.measuring
+                true
+            }
+            QuestionType.TENTACLES -> {
+                type_strings = ObjectTypeQuestionSets.tentacles
+                true
+            }
+            else -> false
+        }
+        if (!type_strings.isEmpty()) {
+            for (str in type_strings) {
+                translated_types.add(ObjectTypeTranslator.str_to_russian(str))
+            }
+            adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item,
+                translated_types)
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            object_type_spinner.adapter = adapter
+            object_type_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    // делать будем только когда позволят
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                    // если ничего не выбрано, блокируем все кнопки
+                    val create_objects_button : Button = (parent as View).findViewById<Button>(R.id.create_show_objects_button)
+                    val create_areas_button : Button = (parent as View).findViewById<Button>(R.id.create_show_areas_button)
+                    val generate_answer_button : Button = (parent as View).findViewById<Button>(R.id.generate_answer_button)
+                    val apply_answer_button : Button = (parent as View).findViewById<Button>(R.id.apply_answer_button)
+                    if (create_objects_button != null) {
+                        create_objects_button.isEnabled = false
+                    }
+                    create_areas_button.isEnabled = false
+                    generate_answer_button.isEnabled = false
+                    apply_answer_button.isEnabled = false
+                }
+            }
+        }
+
+        // TODO: делаем блокировку/разблокировку кнопок в зависимости от ответов
+
+        // добавляем в интерфейс и список
+        question_tablet_list[int_and_type_to_string_id(question_type, list_id)] = layout_question_tablet
+        layout_question_list.addView(layout_question_tablet)
     }
 
 
@@ -475,29 +548,8 @@ class MainActivity : ComponentActivity() {
         params.height = LinearLayout.LayoutParams.WRAP_CONTENT
         label.layoutParams = params
 
-        question_label_list.add(label)
-        when (question_type) {
-            QuestionType.MATCHING -> {
-                question_id_list.add("matching_$list_id")
-                true
-            }
-            QuestionType.MEASURING -> {
-                question_id_list.add("measuring_$list_id")
-                true
-            }
-            QuestionType.THERMOMETER -> {
-                question_id_list.add("thermometer_$list_id")
-                true
-            }
-            QuestionType.RADAR -> {
-                question_id_list.add("radar_$list_id")
-                true
-            }
-            QuestionType.TENTACLES -> {
-                question_id_list.add("tentacles_$list_id")
-                true
-            }
-        }
+        question_type_list[list_id] = question_type
+        question_label_list[int_and_type_to_string_id(question_type, list_id)] = label
     }
 
 
@@ -509,18 +561,51 @@ class MainActivity : ComponentActivity() {
         return strings.get(1).toInt()
     }
 
+    // строковый id в тип вопроса
+    private fun string_id_to_type(question_id: String) : QuestionType {
+        val str = question_id.split("_").get(0)
+        when (str) {
+            "matching" -> { return QuestionType.MATCHING }
+            "measuring" -> { return QuestionType.MEASURING }
+            "radar" -> { return QuestionType.RADAR }
+            "tentacles" -> { return QuestionType.TENTACLES }
+            "thermometer" -> { return QuestionType.THERMOMETER }
+            else -> throw Exception("string_id_to_type() : No question type")
+        }
+    }
+
+    // число и тип в строковый id
+    private fun int_and_type_to_string_id(question_type: QuestionType?, list_id: Int) : String {
+        when (question_type) {
+            QuestionType.MATCHING -> { return "matching_$list_id" }
+            QuestionType.MEASURING -> { return "measuring_$list_id" }
+            QuestionType.RADAR -> { return "radar_$list_id" }
+            QuestionType.TENTACLES -> { return "tentacles_$list_id" }
+            QuestionType.THERMOMETER -> { return "thermometer_$list_id" }
+            else -> throw Exception("int_and_type_to_string_id() : No question type")
+        }
+    }
+
+    // число в строковый id
+    private fun int_to_string_id(list_id: Int) : String {
+        return int_and_type_to_string_id(question_type_list[list_id], list_id)
+    }
+
 
 
 
     // переключить видимость tablet
     private fun toggle_tablet_visibility(list_id : Int) {
-        var params = question_tablet_list.get(list_id).layoutParams
-        if (params.height != 0) {
-            params.height = 0
-        } else {
-            params.height = ViewGroup.LayoutParams.WRAP_CONTENT
+        val q_id = int_to_string_id(list_id)
+        val params = question_tablet_list[q_id]?.layoutParams
+        if (params != null) {
+            if (params.height != 0) {
+                params.height = 0
+            } else {
+                params.height = ViewGroup.LayoutParams.WRAP_CONTENT
+            }
+            question_tablet_list[q_id]?.layoutParams = params
         }
-        question_tablet_list.get(list_id).layoutParams = params
     }
 
 
@@ -529,21 +614,30 @@ class MainActivity : ComponentActivity() {
     // удаление вопроса (и его элементов)
     private fun delete_question(list_id: Int) {
         // удалить элементы интерфейса
-        layout_question_list.removeView(question_label_list.get(list_id))
-        layout_question_list.removeView(question_tablet_list.get(list_id))
+        val q_id = int_to_string_id(list_id)
+        layout_question_list.removeView(question_label_list[q_id])
+        layout_question_list.removeView(question_tablet_list[q_id])
 
         // удалить из списков
-        question_id_list.removeAt(list_id)
-        question_label_list.removeAt(list_id)
-        question_tablet_list.removeAt(list_id)
-        question_object_list.removeAt(list_id)
+        question_type_list.remove(list_id)
+        question_label_list.remove(q_id)
+        question_tablet_list.remove(q_id)
+        question_object_list.remove(q_id)
     }
 
 
 
 
     // создание и отображение объектов
-    private fun create_show_areas(list_id: Int) {
+    private fun create_show_objects(question_type: QuestionType?, list_id: Int) {
+        // TODO: сделать создание и отображение точек
+    }
+
+
+
+
+    // создание и отображение областей
+    private fun create_show_areas(question_type: QuestionType?, list_id: Int) {
         // TODO: сделать создание и отображение объектов
     }
 
@@ -551,7 +645,7 @@ class MainActivity : ComponentActivity() {
 
 
     // генерация ответа
-    private fun generate_answer(list_id: Int) {
+    private fun generate_answer(question_type: QuestionType?, list_id: Int) {
         // TODO: сделать генерацию ответа
     }
 
@@ -559,7 +653,7 @@ class MainActivity : ComponentActivity() {
 
 
     // применение ответа
-    private fun apply_answer(list_id: Int) {
+    private fun apply_answer(question_type: QuestionType?, list_id: Int) {
         // TODO: сделать применение ответа
     }
 }

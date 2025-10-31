@@ -11,7 +11,6 @@
 <!--    Тексты для кнопок-->
     <string name="button_label_create_and_show_areas">Создать и показать \n области</string>
     <string name="button_label_create_and_show_objects">Создать и показать \n объекты</string>
-<!--    <string name="button_label_copy">Скопировать</string>-->
     <string name="button_label_generate_answer">Сгенерировать ответ</string>
     <string name="button_label_apply_answer">Применить ответ</string>
     <string name="button_label_hide">Свернуть</string>
@@ -19,7 +18,9 @@
     <string name="button_label_delete_question">Удалить вопрос</string>
 
 <!--    Текстовые labels-->
-    <string name="text_label_point_coords">Твоё местоположение</string>
+    <string name="text_label_point_coords">Где ты</string>
+    <string name="text_label_seeker_point">Где искатель</string>
+    <string name="text_label_hider_point">Где жертва</string>
     <string name="text_label_object_type">Категория объектов</string>
     <string name="text_label_object_id">ID объекта</string>
     <string name="text_label_distance">Дистанция (км)</string>

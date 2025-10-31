@@ -32,8 +32,6 @@ public class Radar implements Question {
         this.lon = x;
         this.lat = y;
         this.radius = radius;
-
-        create_areas();
     }
 
 

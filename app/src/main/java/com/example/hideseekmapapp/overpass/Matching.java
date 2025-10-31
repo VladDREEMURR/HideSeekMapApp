@@ -49,7 +49,7 @@ public class Matching implements Question {
 
     // private
     private GeometryFactory GF = new GeometryFactory();
-    private HashMap<Long, Point> point_storage = new HashMap<>();
+    public HashMap<Long, Point> point_storage = new HashMap<>();
 
 
 
@@ -57,9 +57,6 @@ public class Matching implements Question {
 
     public Matching (String overpass_query) {
         this.overpass_query = overpass_query;
-
-        exec_overpass();
-        create_areas();
     }
 
 
@@ -157,7 +154,7 @@ public class Matching implements Question {
 
 
 
-    private AnswerSetType get_answer_set_type() {
+    public AnswerSetType get_answer_set_type() {
         if (overpass_query.equals(OverpassQueries.ADMINISTRATIVE_DISTRICT) || overpass_query.equals(OverpassQueries.DISTRICT)) {
             return AnswerSetType.INSIDE_AREA;
         } else {
@@ -194,7 +191,6 @@ public class Matching implements Question {
                 i += 1;
             }
 
-            // TODO: проблема со считыванием областей, разберись
             Polygonizer polygonizer = new Polygonizer();
             polygonizer.add(Arrays.asList(lines));
             Collection coll = polygonizer.getPolygons();

@@ -21,7 +21,7 @@
         <TextView
             android:layout_gravity="fill_horizontal"
             android:textSize="16sp"
-            android:text="Метоположение (искатель)"
+            android:text="@string/text_label_seeker_point"
             />
         <EditText
             android:layout_gravity="fill_horizontal"
@@ -56,7 +56,7 @@
         <TextView
             android:layout_gravity="fill_horizontal"
             android:textSize="16sp"
-            android:text="Метоположение (жертва)"
+            android:text="@string/text_label_hider_point"
             />
         <EditText
             android:layout_gravity="fill_horizontal"
