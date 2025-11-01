@@ -12,11 +12,16 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import android.graphics.Paint
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.EditText
 import android.widget.PopupMenu
 import android.widget.Spinner
+import android.widget.Switch
 import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
 import com.example.hideseekmapapp.overpass.ObjectTypeQuestionSets
 import com.example.hideseekmapapp.overpass.ObjectTypeTranslator
 
@@ -395,6 +400,39 @@ class MainActivity : ComponentActivity() {
 
 
 
+    // добавим новый id вопроса в список
+    private fun create_new_question_id_in_a_list(question_type: QuestionType, list_id : Int) {
+        // делаем строку для списка
+        val label = LinearLayout(this) // контейнер строки
+        val text_label = TextView(this) // label вопроса
+        val toggle_vis_button = Button(this) // кнопка переключения видимости
+
+        // функционал кнопки
+        toggle_vis_button.tag = list_id
+        toggle_vis_button.setOnClickListener { view ->
+            toggle_tablet_visibility(view.tag.toString().toInt())
+        }
+
+        // добавляем в интерфейс
+        layout_question_list.addView(label)
+        label.addView(text_label)
+        label.addView(toggle_vis_button)
+
+        // параметры контейнера
+        val params = label.layoutParams
+        label.orientation = LinearLayout.HORIZONTAL
+        label.setBackgroundColor(ContextCompat.getColor(this@MainActivity, R.color.ui_background_teal))
+        params.width = LinearLayout.LayoutParams.MATCH_PARENT
+        params.height = LinearLayout.LayoutParams.WRAP_CONTENT
+        label.layoutParams = params
+
+        question_type_list[list_id] = question_type
+        question_label_list[int_and_type_to_string_id(question_type, list_id)] = label
+    }
+
+
+
+
     // создание нового tablet и его показ
     private fun create_new_question_tablet(question_type : QuestionType, list_id: Int) {
         // получаем view
@@ -424,12 +462,12 @@ class MainActivity : ComponentActivity() {
         }
         layout_question_tablet.tag = list_id
 
-        val create_objects_button : Button = layout_question_tablet.findViewById<Button>(R.id.create_show_objects_button)
-        val create_areas_button : Button = layout_question_tablet.findViewById<Button>(R.id.create_show_areas_button)
-        val generate_answer_button : Button = layout_question_tablet.findViewById<Button>(R.id.generate_answer_button)
-        val apply_answer_button : Button = layout_question_tablet.findViewById<Button>(R.id.apply_answer_button)
-        val delete_question_button : Button = layout_question_tablet.findViewById<Button>(R.id.delete_question_button)
-        val object_type_spinner = layout_question_tablet.findViewById<Spinner>(R.id.object_type)
+        val create_objects_button : Button = layout_question_tablet.findViewById(R.id.create_show_objects_button)
+        val create_areas_button : Button = layout_question_tablet.findViewById(R.id.create_show_areas_button)
+        val generate_answer_button : Button = layout_question_tablet.findViewById(R.id.generate_answer_button)
+        val apply_answer_button : Button = layout_question_tablet.findViewById(R.id.apply_answer_button)
+        val delete_question_button : Button = layout_question_tablet.findViewById(R.id.delete_question_button)
+        val object_type_spinner : Spinner = layout_question_tablet.findViewById(R.id.object_type)
         create_objects_button.isEnabled = false
         create_areas_button.isEnabled = false
         generate_answer_button.isEnabled = false
@@ -438,25 +476,25 @@ class MainActivity : ComponentActivity() {
         // даём кнопкам функционал
         if (create_objects_button != null) { // создание объектов
             create_objects_button.setOnClickListener { view ->
-                val id = (view.parent as View).tag.toString().toInt()
-                create_show_objects(question_type_list[id], id)
+                val list_id = (view.parent as View).tag.toString().toInt()
+                create_show_objects(question_type_list[list_id], list_id)
             }
         }
         create_areas_button.setOnClickListener { view -> // создание областей
-            val id = (view.parent as View).tag.toString().toInt()
-            create_show_areas(question_type_list[id], id)
+            val list_id = (view.parent as View).tag.toString().toInt()
+            create_show_areas(question_type_list[list_id], list_id)
         }
         generate_answer_button.setOnClickListener { view -> // генерирование ответа
-            val id = (view.parent as View).tag.toString().toInt()
-            generate_answer(question_type_list[id], id)
+            val list_id = (view.parent as View).tag.toString().toInt()
+            generate_answer(question_type_list[list_id], list_id)
         }
         apply_answer_button.setOnClickListener { view -> // применение ответа
-            val id = (view.parent as View).tag.toString().toInt()
-            apply_answer(question_type_list[id], id)
+            val list_id = (view.parent as View).tag.toString().toInt()
+            apply_answer(question_type_list[list_id], list_id)
         }
         delete_question_button.setOnClickListener { view -> // удаление ответа
-            val id = (view.parent as View).tag.toString().toInt()
-            delete_question(id)
+            val list_id = (view.parent as View).tag.toString().toInt()
+            delete_question(list_id)
         }
 
         // даём спиннеру функционал
@@ -487,32 +525,27 @@ class MainActivity : ComponentActivity() {
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             object_type_spinner.adapter = adapter
             object_type_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-                    // делать будем только когда позволят
+                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                    renew_button_enabled_status(parent as View)
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
-                    // если ничего не выбрано, блокируем все кнопки
-                    val create_objects_button : Button = (parent as View).findViewById<Button>(R.id.create_show_objects_button)
-                    val create_areas_button : Button = (parent as View).findViewById<Button>(R.id.create_show_areas_button)
-                    val generate_answer_button : Button = (parent as View).findViewById<Button>(R.id.generate_answer_button)
-                    val apply_answer_button : Button = (parent as View).findViewById<Button>(R.id.apply_answer_button)
-                    if (create_objects_button != null) {
-                        create_objects_button.isEnabled = false
-                    }
-                    create_areas_button.isEnabled = false
-                    generate_answer_button.isEnabled = false
-                    apply_answer_button.isEnabled = false
+                    renew_button_enabled_status(parent as View)
                 }
             }
         }
 
         // TODO: делаем блокировку/разблокировку кнопок в зависимости от ответов
+        val seeker_point_field : EditText? = layout_question_tablet.findViewById(R.id.seeker_point)
+        val object_id_field : EditText? = layout_question_tablet.findViewById(R.id.object_id)
+        val distance_field : EditText? = layout_question_tablet.findViewById(R.id.distance)
+        val point_colder_field : EditText? = layout_question_tablet.findViewById(R.id.point_colder)
+        val point_hotter_field : EditText? = layout_question_tablet.findViewById(R.id.point_hotter)
+            // обновляемые поля для прячущегося
+        val hider_point_field : EditText? = layout_question_tablet.findViewById(R.id.hider_point)
+
+        add_field_renew_ivent(seeker_point_field)
+
 
         // добавляем в интерфейс и список
         question_tablet_list[int_and_type_to_string_id(question_type, list_id)] = layout_question_tablet
@@ -522,34 +555,116 @@ class MainActivity : ComponentActivity() {
 
 
 
-    // добавим новый id вопроса в список
-    private fun create_new_question_id_in_a_list(question_type: QuestionType, list_id : Int) {
-        // делаем строку для списка
-        val label = LinearLayout(this) // контейнер строки
-        val text_label = TextView(this) // label вопроса
-        val toggle_vis_button = Button(this) // кнопка переключения видимости
+    // добавить текстовому полю обновление статуса кнопок
+    private fun add_field_renew_ivent(edit_text : EditText?) {
+        if (edit_text != null) {
+            edit_text.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
-        // функционал кнопки
-        toggle_vis_button.tag = list_id
-        toggle_vis_button.setOnClickListener { view ->
-            toggle_tablet_visibility(view.tag.toString().toInt())
+                override fun afterTextChanged(s: Editable?) {
+                    // ничего не делаем
+                    val parent = edit_text.parent as View
+                    val list_id = parent.tag.toString().toInt()
+                    val str_id = int_to_string_id(list_id)
+                    val question_type = question_type_list[list_id]
+                    val create_objects_button: Button = parent.findViewById(R.id.create_show_objects_button)
+                    val create_areas_button: Button = parent.findViewById(R.id.create_show_areas_button)
+                    val generate_answer_button: Button = parent.findViewById(R.id.generate_answer_button)
+                    val apply_answer_button: Button = parent.findViewById(R.id.apply_answer_button)
+
+                    // обновление для всех кнопок каждого типа вопроса
+                    if (s.toString().length > 0) {
+                        create_objects_button.isEnabled = true
+                    } else {
+                        create_objects_button.isEnabled = false
+                    }
+                    when (question_type) {
+                        QuestionType.MATCHING -> {
+                            if (parent.findViewById<EditText>(R.id.seeker_point).text.length > 0) {
+                                create_objects_button.isEnabled = true
+                            }
+                            if (question_object_list.containsKey(str_id)) {
+                                create_areas_button.isEnabled = true
+                                apply_answer_button.isEnabled = true
+                                if (parent.findViewById<EditText>(R.id.object_id).text.length > 0) {
+                                    generate_answer_button.isEnabled = true
+                                }
+                            }
+                            true
+                        }
+                        QuestionType.MEASURING -> {
+                            if (parent.findViewById<EditText>(R.id.seeker_point).text.length > 0) {
+                                create_objects_button.isEnabled = true
+                            }
+                            if (question_object_list.containsKey(str_id)) {
+                                create_areas_button.isEnabled = true
+                                apply_answer_button.isEnabled = true
+                                if (parent.findViewById<EditText>(R.id.distance).text.length > 0) {
+                                    generate_answer_button.isEnabled = true
+                                }
+                            }
+                            true
+                        }
+                        QuestionType.RADAR -> {
+                            if (
+                                parent.findViewById<EditText>(R.id.seeker_point).text.length > 0 &&
+                                parent.findViewById<EditText>(R.id.distance).text.length > 0
+                            ) {
+                                create_areas_button.isEnabled = true
+                            }
+                            if (question_object_list.containsKey(str_id)) {
+                                apply_answer_button.isEnabled = true
+                                if (parent.findViewById<EditText>(R.id.hider_point).text.length > 0) {
+                                    generate_answer_button.isEnabled = true
+                                }
+                            }
+                            true
+                        }
+                        QuestionType.TENTACLES -> {
+                            if (
+                                parent.findViewById<EditText>(R.id.seeker_point).text.length > 0 &&
+                                parent.findViewById<EditText>(R.id.distance).text.length > 0
+                            ) {
+                                create_objects_button.isEnabled = true
+                            }
+                            if (question_object_list.containsKey(str_id)) {
+                                create_areas_button.isEnabled = true
+                                apply_answer_button.isEnabled = true
+                                if (parent.findViewById<EditText>(R.id.hider_point).text.length > 0) {
+                                    generate_answer_button.isEnabled = true
+                                }
+                            }
+                            true
+                        }
+                        QuestionType.THERMOMETER -> {
+                            if (
+                                parent.findViewById<EditText>(R.id.seeker_point).text.length > 0 &&
+                                parent.findViewById<EditText>(R.id.distance).text.length > 0
+                            ) {
+                                create_areas_button.isEnabled = true
+                            }
+                            if (question_object_list.containsKey(str_id)) {
+                                apply_answer_button.isEnabled = true
+                                if (parent.findViewById<EditText>(R.id.hider_point).text.length > 0) {
+                                    generate_answer_button.isEnabled = true
+                                }
+                            }
+                            true
+                        }
+                        else -> false
+                    }
+                }
+            })
         }
+    }
 
-        // добавляем в интерфейс
-        layout_question_list.addView(label)
-        label.addView(text_label)
-        label.addView(toggle_vis_button)
 
-        // параметры контейнера
-        val params = label.layoutParams
-        label.orientation = LinearLayout.HORIZONTAL
-        label.setBackgroundColor(ContextCompat.getColor(this@MainActivity, R.color.ui_background_teal))
-        params.width = LinearLayout.LayoutParams.MATCH_PARENT
-        params.height = LinearLayout.LayoutParams.WRAP_CONTENT
-        label.layoutParams = params
 
-        question_type_list[list_id] = question_type
-        question_label_list[int_and_type_to_string_id(question_type, list_id)] = label
+
+    // обновление доступности кнопок для каждого вопроса
+    private fun renew_button_enabled_status(tablet_view : View) {
+
     }
 
 
@@ -630,6 +745,7 @@ class MainActivity : ComponentActivity() {
 
     // создание и отображение объектов
     private fun create_show_objects(question_type: QuestionType?, list_id: Int) {
+        if (question_type == null) {throw Exception("create_show_objects() : No question type")}
         // TODO: сделать создание и отображение точек
     }
 
@@ -638,6 +754,7 @@ class MainActivity : ComponentActivity() {
 
     // создание и отображение областей
     private fun create_show_areas(question_type: QuestionType?, list_id: Int) {
+        if (question_type == null) {throw Exception("create_show_areas() : No question type")}
         // TODO: сделать создание и отображение объектов
     }
 
@@ -646,6 +763,7 @@ class MainActivity : ComponentActivity() {
 
     // генерация ответа
     private fun generate_answer(question_type: QuestionType?, list_id: Int) {
+        if (question_type == null) {throw Exception("generate_answer() : No question type")}
         // TODO: сделать генерацию ответа
     }
 
@@ -654,6 +772,7 @@ class MainActivity : ComponentActivity() {
 
     // применение ответа
     private fun apply_answer(question_type: QuestionType?, list_id: Int) {
+        if (question_type == null) {throw Exception("apply_answer() : No question type")}
         // TODO: сделать применение ответа
     }
 }
