@@ -1,6 +1,10 @@
 package com.example.hideseekmapapp.overpass;
 
 public class OverpassQueries {
+    public static String GLOBAL_AREA =
+            "[out:xml][timeout:25];\n" +
+                    "relation[\"name\" = \"Москва\"][\"place\" = \"city\"];\n" +
+                    "out geom;";
     public static String COMMERCIAL_AIRPORT =
             "[out:xml][timeout:25][bbox:55.489,37.216,55.989,38.206];\n" +
                     "nwr[\"aeroway\"=\"aerodrome\"][\"aerodrome:type\"=\"public\"];\n" +

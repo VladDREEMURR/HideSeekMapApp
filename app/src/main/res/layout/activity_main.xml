@@ -51,7 +51,7 @@
 <!--  Кнопки интерфейса  -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="60dp"
         android:orientation="horizontal"
         android:background="@color/ui_background_dark_red"
         >
@@ -70,6 +70,14 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="Настройки"
+            />
+
+        <Button
+            android:id="@+id/clear_map_button"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Очистить карту"
             />
 
     </LinearLayout>
@@ -148,17 +156,7 @@
 -->
 
         <TextView
-            android:text="Настройки"
-            />
-        <Button
-            android:text="\\/ (не работает)"
-            />
-
-        <TextView
-            android:text="Режим Искателя"
-            />
-        <Button
-            android:text="Переключить (не работает)"
+            android:text="Ничего тут нет"
             />
 
     </GridLayout>

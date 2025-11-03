@@ -9,6 +9,8 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.operation.polygonize.Polygonizer;
+import org.locationtech.jts.util.GeometricShapeFactory;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -33,7 +35,7 @@ public class Measuring implements Question {
     public String overpass_query = "";
     public double lon = 0.0; // точка отсчёта дистанции (x)
     public double lat = 0.0; // точка отсчёта дистанции (y)
-    public Envelope bbox = null; // квадрат поиска (необязателен, нужен только при огромных количествах объектов)
+    public MultiPolygon area_of_effect = null; // квадрат поиска (необязателен, нужен только при огромных количествах объектов)
 
     // состояния вопроса
     public boolean answered = false;
@@ -53,11 +55,11 @@ public class Measuring implements Question {
 
 
 
-    public Measuring (@NonNull String overpass_query, double lon, double lat, Envelope bbox) {
+    public Measuring (@NonNull String overpass_query, double lon, double lat, MultiPolygon area_of_effect) {
         this.overpass_query = overpass_query;
         this.lon = lon;
         this.lat = lat;
-        this.bbox = bbox;
+        this.area_of_effect = area_of_effect;
         this.comparator_point = GF.createPoint(new Coordinate(lon, lat));
     }
 
@@ -101,12 +103,10 @@ public class Measuring implements Question {
         rad = count_min_distance(comparator_point);
 
         // сократить количества точек (если их слишком много и есть Envelope)
-        if (bbox != null && target_points.length > 300) {
-            point_storage = new ArrayList<>();
-            for (int i = 0; i < target_points.length; i++) {
-                if (bbox.covers(target_points[i].getCoordinate())) {
-                    point_storage.add(target_points[i]);
-                }
+        point_storage = new ArrayList<>();
+        for (int i = 0; i < target_points.length; i++) {
+            if (area_of_effect.covers(target_points[i])) {
+                point_storage.add(target_points[i]);
             }
         }
         target_points = point_storage.toArray(new Point[point_storage.size()]);

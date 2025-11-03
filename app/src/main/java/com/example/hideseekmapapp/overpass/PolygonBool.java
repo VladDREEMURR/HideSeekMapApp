@@ -153,6 +153,7 @@ public class PolygonBool {
             temp.add(temp.get(0));
             regions.add(temp);
         }
+        int sz = regions.size();
 
         // создаём кольца
         for (ArrayList<double[]> region : regions) {
@@ -171,7 +172,7 @@ public class PolygonBool {
         // полигонизируем
         org.locationtech.jts.operation.polygonize.Polygonizer polygonizer = new org.locationtech.jts.operation.polygonize.Polygonizer(true);
         polygonizer.add(mls);
-        Collection coll = polygonizer.getPolygons();
+        Collection<org.locationtech.jts.geom.Polygon> coll = polygonizer.getPolygons();
         org.locationtech.jts.geom.Polygon[] polygon_arr = new org.locationtech.jts.geom.Polygon[coll.size()];
         coll.toArray(polygon_arr);
         return polygon_arr;

@@ -22,6 +22,10 @@ import android.widget.Spinner
 import android.widget.Switch
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
+import com.example.hideseekmapapp.overpass.AnswerSetType
+import com.example.hideseekmapapp.overpass.GlobalAreaFounder
+import com.example.hideseekmapapp.overpass.Matching
+import com.example.hideseekmapapp.overpass.Measuring
 import com.example.hideseekmapapp.overpass.ObjectTypeQuestionSets
 import com.example.hideseekmapapp.overpass.ObjectTypeTranslator
 
@@ -29,8 +33,11 @@ import com.example.hideseekmapapp.overpass.Question
 import com.example.hideseekmapapp.overpass.QuestionType
 import com.example.hideseekmapapp.overpass.Radar
 import com.example.hideseekmapapp.overpass.OverpassProcessor
+import com.example.hideseekmapapp.overpass.OverpassQueries
 import com.example.hideseekmapapp.overpass.PolygonBool
 import com.example.hideseekmapapp.overpass.PolygonBoolOperationType
+import com.example.hideseekmapapp.overpass.Tentacles
+import com.example.hideseekmapapp.overpass.Thermometer
 
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
@@ -64,6 +71,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var button_zoom_area : Button
     private lateinit var button_questions : Button
     private lateinit var button_settings : Button
+    private lateinit var button_clear_map : Button
     private lateinit var button_new_question : Button
     private lateinit var layout_question_list : LinearLayout
     private lateinit var layout_question_block : LinearLayout
@@ -82,6 +90,7 @@ class MainActivity : ComponentActivity() {
 
     // зона поиска
     private lateinit var remaining_area : org.locationtech.jts.geom.MultiPolygon
+    private lateinit var global_area : org.locationtech.jts.geom.MultiPolygon
     private lateinit var bounding_box : BoundingBox
 
     // вспомогательное
@@ -101,24 +110,34 @@ class MainActivity : ComponentActivity() {
         // яндекс карты подготовка
         MapKitFactory.setApiKey("60b6e681-e142-4dd6-8f98-73996515ab97")
         MapKitFactory.initialize(this@MainActivity)
+        val GAF = GlobalAreaFounder(OverpassQueries.GLOBAL_AREA)
+        global_area = GAF.area
+        remaining_area = global_area
+
 
         // подготовка интерфейса
         prepare_interface()
 
         // блок тестового вывода
         test_output_block = findViewById(R.id.test_output)
+        val query = OverpassQueries.MUSEUM
+        /*
+        val OP = OverpassProcessor()
+        val p_arr = OP.testOverpass(query)
+        for (point in p_arr) {
+            add_point_to_map(point, ContextCompat.getColor(this@MainActivity, R.color.dot_of_object))
+        }
+
+         */
 
         // some code
-        val start_x = 37.490
-        val start_y = 55.746
-        val end_x = 37.66
-        val end_y = 55.76
-        val curr_point = GF.createPoint(org.locationtech.jts.geom.Coordinate(start_x, start_y))
-        val radar = Radar(start_x, start_y, 5.0)
-        radar.create_areas()
-        remaining_area = GF.createMultiPolygon(arrayOf(radar.area))
-
-        add_point_to_map(curr_point, ContextCompat.getColor(this@MainActivity, R.color.dot_location))
+        val start_x = 37.542
+        val start_y = 55.745
+        val end_x = 37.604
+        val end_y = 55.745
+        val start_point = GF.createPoint(org.locationtech.jts.geom.Coordinate(start_x, start_y))
+        val end_point = GF.createPoint(org.locationtech.jts.geom.Coordinate(end_x, end_y))
+//        add_point_to_map(start_point, ContextCompat.getColor(this@MainActivity, R.color.dot_location))
         draw_remaining_area()
 
         try {
@@ -185,7 +204,7 @@ class MainActivity : ComponentActivity() {
         val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         val paint = Paint().apply {
-            this.color = 0xFFFF0000.toInt()
+            this.color = color
             isAntiAlias = true
         }
         canvas.drawCircle(size / 2f, size / 2f, size / 2f, paint)
@@ -244,6 +263,7 @@ class MainActivity : ComponentActivity() {
 
     private fun clear_map() {
         map_view.map.mapObjects.clear()
+        draw_remaining_area()
     }
 
 
@@ -266,6 +286,7 @@ class MainActivity : ComponentActivity() {
         button_zoom_area = findViewById(R.id.zoom_area_button)
         button_questions = findViewById(R.id.toggle_questions_button)
         button_settings = findViewById(R.id.toggle_settings_button)
+        button_clear_map = findViewById(R.id.clear_map_button)
         button_new_question = findViewById(R.id.new_question_button)
         layout_question_list = findViewById(R.id.question_list_layout)
         layout_question_block = findViewById(R.id.questions_layout)
@@ -316,6 +337,9 @@ class MainActivity : ComponentActivity() {
                 settings_shown = true
             }
             refresh_layout_weights()
+        }
+        button_clear_map.setOnClickListener {
+            clear_map()
         }
         button_new_question.setOnClickListener { view ->
             val popup_menu = PopupMenu(this, view)
@@ -462,19 +486,19 @@ class MainActivity : ComponentActivity() {
         }
         layout_question_tablet.tag = list_id
 
-        val create_objects_button : Button = layout_question_tablet.findViewById(R.id.create_show_objects_button)
+        val create_objects_button : Button? = layout_question_tablet.findViewById(R.id.create_show_objects_button)
         val create_areas_button : Button = layout_question_tablet.findViewById(R.id.create_show_areas_button)
         val generate_answer_button : Button = layout_question_tablet.findViewById(R.id.generate_answer_button)
         val apply_answer_button : Button = layout_question_tablet.findViewById(R.id.apply_answer_button)
         val delete_question_button : Button = layout_question_tablet.findViewById(R.id.delete_question_button)
-        val object_type_spinner : Spinner = layout_question_tablet.findViewById(R.id.object_type)
-        create_objects_button.isEnabled = false
+        val object_type_spinner : Spinner? = layout_question_tablet.findViewById(R.id.object_type)
         create_areas_button.isEnabled = false
         generate_answer_button.isEnabled = false
         apply_answer_button.isEnabled = false
 
         // даём кнопкам функционал
         if (create_objects_button != null) { // создание объектов
+            create_objects_button.isEnabled = false
             create_objects_button.setOnClickListener { view ->
                 val list_id = (view.parent as View).tag.toString().toInt()
                 create_show_objects(question_type_list[list_id], list_id)
@@ -516,7 +540,7 @@ class MainActivity : ComponentActivity() {
             }
             else -> false
         }
-        if (!type_strings.isEmpty()) {
+        if (!type_strings.isEmpty() && object_type_spinner != null) {
             for (str in type_strings) {
                 translated_types.add(ObjectTypeTranslator.str_to_russian(str))
             }
@@ -526,16 +550,16 @@ class MainActivity : ComponentActivity() {
             object_type_spinner.adapter = adapter
             object_type_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                    renew_button_enabled_status(parent as View)
+                    // пока нечего делать
                 }
-
                 override fun onNothingSelected(parent: AdapterView<*>?) {
-                    renew_button_enabled_status(parent as View)
+                    // хз, как ничего-невыбираение может произойти
+                    // TODO: на случай, если будет возможно ничего не выбрать, предусмотреть
                 }
             }
         }
 
-        // TODO: делаем блокировку/разблокировку кнопок в зависимости от ответов
+        // добавление блокировки/разблокировки кнопок в зависимости от ответов
         val seeker_point_field : EditText? = layout_question_tablet.findViewById(R.id.seeker_point)
         val object_id_field : EditText? = layout_question_tablet.findViewById(R.id.object_id)
         val distance_field : EditText? = layout_question_tablet.findViewById(R.id.distance)
@@ -543,8 +567,13 @@ class MainActivity : ComponentActivity() {
         val point_hotter_field : EditText? = layout_question_tablet.findViewById(R.id.point_hotter)
             // обновляемые поля для прячущегося
         val hider_point_field : EditText? = layout_question_tablet.findViewById(R.id.hider_point)
-
+            // добавляем функцию обновления
         add_field_renew_ivent(seeker_point_field)
+        add_field_renew_ivent(object_id_field)
+        add_field_renew_ivent(distance_field)
+        add_field_renew_ivent(point_colder_field)
+        add_field_renew_ivent(point_hotter_field)
+        add_field_renew_ivent(hider_point_field)
 
 
         // добавляем в интерфейс и список
@@ -563,97 +592,7 @@ class MainActivity : ComponentActivity() {
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
                 override fun afterTextChanged(s: Editable?) {
-                    // ничего не делаем
-                    val parent = edit_text.parent as View
-                    val list_id = parent.tag.toString().toInt()
-                    val str_id = int_to_string_id(list_id)
-                    val question_type = question_type_list[list_id]
-                    val create_objects_button: Button = parent.findViewById(R.id.create_show_objects_button)
-                    val create_areas_button: Button = parent.findViewById(R.id.create_show_areas_button)
-                    val generate_answer_button: Button = parent.findViewById(R.id.generate_answer_button)
-                    val apply_answer_button: Button = parent.findViewById(R.id.apply_answer_button)
-
-                    // обновление для всех кнопок каждого типа вопроса
-                    if (s.toString().length > 0) {
-                        create_objects_button.isEnabled = true
-                    } else {
-                        create_objects_button.isEnabled = false
-                    }
-                    when (question_type) {
-                        QuestionType.MATCHING -> {
-                            if (parent.findViewById<EditText>(R.id.seeker_point).text.length > 0) {
-                                create_objects_button.isEnabled = true
-                            }
-                            if (question_object_list.containsKey(str_id)) {
-                                create_areas_button.isEnabled = true
-                                apply_answer_button.isEnabled = true
-                                if (parent.findViewById<EditText>(R.id.object_id).text.length > 0) {
-                                    generate_answer_button.isEnabled = true
-                                }
-                            }
-                            true
-                        }
-                        QuestionType.MEASURING -> {
-                            if (parent.findViewById<EditText>(R.id.seeker_point).text.length > 0) {
-                                create_objects_button.isEnabled = true
-                            }
-                            if (question_object_list.containsKey(str_id)) {
-                                create_areas_button.isEnabled = true
-                                apply_answer_button.isEnabled = true
-                                if (parent.findViewById<EditText>(R.id.distance).text.length > 0) {
-                                    generate_answer_button.isEnabled = true
-                                }
-                            }
-                            true
-                        }
-                        QuestionType.RADAR -> {
-                            if (
-                                parent.findViewById<EditText>(R.id.seeker_point).text.length > 0 &&
-                                parent.findViewById<EditText>(R.id.distance).text.length > 0
-                            ) {
-                                create_areas_button.isEnabled = true
-                            }
-                            if (question_object_list.containsKey(str_id)) {
-                                apply_answer_button.isEnabled = true
-                                if (parent.findViewById<EditText>(R.id.hider_point).text.length > 0) {
-                                    generate_answer_button.isEnabled = true
-                                }
-                            }
-                            true
-                        }
-                        QuestionType.TENTACLES -> {
-                            if (
-                                parent.findViewById<EditText>(R.id.seeker_point).text.length > 0 &&
-                                parent.findViewById<EditText>(R.id.distance).text.length > 0
-                            ) {
-                                create_objects_button.isEnabled = true
-                            }
-                            if (question_object_list.containsKey(str_id)) {
-                                create_areas_button.isEnabled = true
-                                apply_answer_button.isEnabled = true
-                                if (parent.findViewById<EditText>(R.id.hider_point).text.length > 0) {
-                                    generate_answer_button.isEnabled = true
-                                }
-                            }
-                            true
-                        }
-                        QuestionType.THERMOMETER -> {
-                            if (
-                                parent.findViewById<EditText>(R.id.seeker_point).text.length > 0 &&
-                                parent.findViewById<EditText>(R.id.distance).text.length > 0
-                            ) {
-                                create_areas_button.isEnabled = true
-                            }
-                            if (question_object_list.containsKey(str_id)) {
-                                apply_answer_button.isEnabled = true
-                                if (parent.findViewById<EditText>(R.id.hider_point).text.length > 0) {
-                                    generate_answer_button.isEnabled = true
-                                }
-                            }
-                            true
-                        }
-                        else -> false
-                    }
+                    renew_buttons_enability(edit_text.parent as View)
                 }
             })
         }
@@ -662,9 +601,92 @@ class MainActivity : ComponentActivity() {
 
 
 
-    // обновление доступности кнопок для каждого вопроса
-    private fun renew_button_enabled_status(tablet_view : View) {
+    // обновить кнопки
+    private fun renew_buttons_enability(tablet : View) {
+        val list_id = tablet.tag.toString().toInt()
+        val str_id = int_to_string_id(list_id)
+        val question_type = question_type_list[list_id]
+        val create_objects_button: Button? = tablet.findViewById(R.id.create_show_objects_button)
+        val create_areas_button: Button = tablet.findViewById(R.id.create_show_areas_button)
+        val generate_answer_button: Button = tablet.findViewById(R.id.generate_answer_button)
+        val apply_answer_button: Button = tablet.findViewById(R.id.apply_answer_button)
 
+        // обновление для всех кнопок каждого типа вопроса
+        when (question_type) {
+            QuestionType.MATCHING -> {
+                if (tablet.findViewById<EditText>(R.id.seeker_point).text.length > 0) {
+                    create_objects_button?.isEnabled = true
+                }
+                if (question_object_list.containsKey(str_id)) {
+                    create_areas_button.isEnabled = true
+                    apply_answer_button.isEnabled = true
+                    if (tablet.findViewById<EditText>(R.id.object_id).text.length > 0) {
+                        generate_answer_button.isEnabled = true
+                    }
+                }
+                true
+            }
+            QuestionType.MEASURING -> {
+                if (tablet.findViewById<EditText>(R.id.seeker_point).text.length > 0) {
+                    create_objects_button?.isEnabled = true
+                }
+                if (question_object_list.containsKey(str_id)) {
+                    create_areas_button.isEnabled = true
+                    apply_answer_button.isEnabled = true
+                    if (tablet.findViewById<EditText>(R.id.distance).text.length > 0) {
+                        generate_answer_button.isEnabled = true
+                    }
+                }
+                true
+            }
+            QuestionType.RADAR -> {
+                if (
+                    tablet.findViewById<EditText>(R.id.seeker_point).text.length > 0 &&
+                    tablet.findViewById<EditText>(R.id.distance).text.length > 0
+                ) {
+                    create_areas_button.isEnabled = true
+                }
+                if (question_object_list.containsKey(str_id)) {
+                    apply_answer_button.isEnabled = true
+                    if (tablet.findViewById<EditText>(R.id.hider_point).text.length > 0) {
+                        generate_answer_button.isEnabled = true
+                    }
+                }
+                true
+            }
+            QuestionType.TENTACLES -> {
+                if (
+                    tablet.findViewById<EditText>(R.id.seeker_point).text.length > 0 &&
+                    tablet.findViewById<EditText>(R.id.distance).text.length > 0
+                ) {
+                    create_objects_button?.isEnabled = true
+                }
+                if (question_object_list.containsKey(str_id)) {
+                    create_areas_button.isEnabled = true
+                    apply_answer_button.isEnabled = true
+                    if (tablet.findViewById<EditText>(R.id.hider_point).text.length > 0) {
+                        generate_answer_button.isEnabled = true
+                    }
+                }
+                true
+            }
+            QuestionType.THERMOMETER -> {
+                if (
+                    tablet.findViewById<EditText>(R.id.point_colder).text.length > 0 &&
+                    tablet.findViewById<EditText>(R.id.point_hotter).text.length > 0
+                ) {
+                    create_areas_button.isEnabled = true
+                }
+                if (question_object_list.containsKey(str_id)) {
+                    apply_answer_button.isEnabled = true
+                    if (tablet.findViewById<EditText>(R.id.hider_point).text.length > 0) {
+                        generate_answer_button.isEnabled = true
+                    }
+                }
+                true
+            }
+            else -> false
+        }
     }
 
 
@@ -743,10 +765,133 @@ class MainActivity : ComponentActivity() {
 
 
 
+    // строка в точку
+    private fun str_to_point(str : String) : org.locationtech.jts.geom.Point {
+        val strings = str.split(", ")
+        if (strings.size == 2) {
+            val y = strings[0].toDoubleOrNull()
+            val x = strings[1].toDoubleOrNull()
+            if (x == null || y == null) {
+                return remaining_area.centroid
+            } else {
+                return GF.createPoint(org.locationtech.jts.geom.Coordinate(x, y))
+            }
+        } else {
+            return remaining_area.centroid
+        }
+    }
+
+
+
+
+    // строка в число
+    private fun str_to_double(str: String) : Double {
+        val d = str.toDoubleOrNull()
+        if (d == null || d < 0.0) {
+            return 1.0
+        } else {
+            return d
+        }
+    }
+
+
+
+
     // создание и отображение объектов
     private fun create_show_objects(question_type: QuestionType?, list_id: Int) {
         if (question_type == null) {throw Exception("create_show_objects() : No question type")}
-        // TODO: сделать создание и отображение точек
+        // TODO: протестировать
+        var question : Question? = null
+        val tablet = question_tablet_list[int_to_string_id(list_id)]
+        when (question_type) {
+            QuestionType.MATCHING -> {
+                val eng_type_str = ObjectTypeTranslator.russian_to_str((tablet?.findViewById<Spinner>(R.id.object_type)?.selectedItem) as String)
+                val point = str_to_point(tablet.findViewById<EditText>(R.id.seeker_point).text.toString())
+                question = Matching(
+                    ObjectTypeTranslator.str_to_query(eng_type_str)
+                )
+                question.exec_overpass()
+                if (question.get_answer_set_type() == AnswerSetType.VORONOI) {
+                    val point_arr = question.point_storage.values
+                    for (p in point_arr) {
+                        add_point_to_map(p, ContextCompat.getColor(this@MainActivity, R.color.dot_of_object))
+                    }
+                }
+                add_point_to_map(point, ContextCompat.getColor(this@MainActivity, R.color.dot_location))
+                true
+            }
+            QuestionType.MEASURING -> {
+                val eng_type_str = ObjectTypeTranslator.russian_to_str((tablet?.findViewById<Spinner>(R.id.object_type)?.selectedItem) as String)
+                val point = str_to_point(tablet.findViewById<EditText>(R.id.seeker_point).text.toString())
+                question = Measuring(
+                    ObjectTypeTranslator.str_to_query(eng_type_str),
+                    point.x,
+                    point.y,
+                    global_area
+                )
+                question.exec_overpass()
+                val point_arr = question.target_points
+                for (p in point_arr) {
+                    add_point_to_map(p, ContextCompat.getColor(this@MainActivity, R.color.dot_of_object))
+                }
+                add_point_to_map(point, ContextCompat.getColor(this@MainActivity, R.color.dot_location))
+                true
+            }
+            /*
+            QuestionType.RADAR -> {
+                val tablet = question_tablet_list[int_to_string_id(list_id)]
+                val point = str_to_point(tablet?.findViewById<EditText>(R.id.seeker_point)?.text.toString())
+                val distance = str_to_double(tablet?.findViewById<EditText>(R.id.distance)?.text.toString())
+                question = Radar(
+                    point.x,
+                    point.y,
+                    distance
+                )
+                add_point_to_map(point, ContextCompat.getColor(this@MainActivity, R.color.dot_location))
+                true
+            }
+            */
+            QuestionType.TENTACLES -> {
+                val eng_type_str = ObjectTypeTranslator.russian_to_str((tablet?.findViewById<Spinner>(R.id.object_type)?.selectedItem) as String)
+                val point = str_to_point(tablet.findViewById<EditText>(R.id.seeker_point).text.toString())
+                val distance = str_to_double(tablet.findViewById<EditText>(R.id.distance).text.toString())
+                question = Tentacles(
+                    ObjectTypeTranslator.str_to_query(eng_type_str),
+                    point.x,
+                    point.y,
+                    distance
+                )
+                question.exec_overpass()
+                val point_arr = question.point_storage.values
+                for (p in point_arr) {
+                    add_point_to_map(p, ContextCompat.getColor(this@MainActivity, R.color.dot_of_object))
+                }
+                add_point_to_map(point, ContextCompat.getColor(this@MainActivity, R.color.dot_location))
+                true
+            }
+            /*
+            QuestionType.THERMOMETER -> {
+                val tablet = question_tablet_list[int_to_string_id(list_id)]
+                val point_colder = str_to_point(tablet?.findViewById<EditText>(R.id.point_colder)?.text.toString())
+                val point_hotter = str_to_point(tablet?.findViewById<EditText>(R.id.point_hotter)?.text.toString())
+                question = Thermometer(
+                    global_area,
+                    point_colder.x,
+                    point_colder.y,
+                    point_hotter.x,
+                    point_hotter.y
+                )
+                add_point_to_map(point_colder, ContextCompat.getColor(this@MainActivity, R.color.dot_of_object))
+                add_point_to_map(point_hotter, ContextCompat.getColor(this@MainActivity, R.color.dot_of_object))
+                true
+            }
+            */
+            else -> false
+        }
+        if (question != null && tablet != null) {
+            question_object_list[int_to_string_id(list_id)] = question
+            renew_buttons_enability(tablet)
+        }
     }
 
 
@@ -756,6 +901,23 @@ class MainActivity : ComponentActivity() {
     private fun create_show_areas(question_type: QuestionType?, list_id: Int) {
         if (question_type == null) {throw Exception("create_show_areas() : No question type")}
         // TODO: сделать создание и отображение объектов
+        when (question_type) {
+            QuestionType.MATCHING -> {
+                true
+            }
+            QuestionType.MEASURING -> {
+                true
+            }
+            QuestionType.RADAR -> {
+                true
+            }
+            QuestionType.TENTACLES -> {
+                true
+            }
+            QuestionType.THERMOMETER -> {
+                true
+            }
+        }
     }
 
 
@@ -765,6 +927,23 @@ class MainActivity : ComponentActivity() {
     private fun generate_answer(question_type: QuestionType?, list_id: Int) {
         if (question_type == null) {throw Exception("generate_answer() : No question type")}
         // TODO: сделать генерацию ответа
+        when (question_type) {
+            QuestionType.MATCHING -> {
+                true
+            }
+            QuestionType.MEASURING -> {
+                true
+            }
+            QuestionType.RADAR -> {
+                true
+            }
+            QuestionType.TENTACLES -> {
+                true
+            }
+            QuestionType.THERMOMETER -> {
+                true
+            }
+        }
     }
 
 
@@ -774,5 +953,22 @@ class MainActivity : ComponentActivity() {
     private fun apply_answer(question_type: QuestionType?, list_id: Int) {
         if (question_type == null) {throw Exception("apply_answer() : No question type")}
         // TODO: сделать применение ответа
+        when (question_type) {
+            QuestionType.MATCHING -> {
+                true
+            }
+            QuestionType.MEASURING -> {
+                true
+            }
+            QuestionType.RADAR -> {
+                true
+            }
+            QuestionType.TENTACLES -> {
+                true
+            }
+            QuestionType.THERMOMETER -> {
+                true
+            }
+        }
     }
 }

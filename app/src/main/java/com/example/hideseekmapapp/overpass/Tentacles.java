@@ -44,12 +44,12 @@ public class Tentacles implements Question {
     public Long id_of_interest = 0L; // ключ к Map, подходящий объект
     public MultiPolygon area = null; // результирующая область (мульти может быть из-за проверки на принадлежность району)
     public String area_name = ""; // название варианта
-    public MultiPolygon circle = null; // область тентаклей
+    public Polygon circle = null; // область тентаклей
     public boolean is_inside = false; // находится ли вообще внутри круга
 
     // private
     private GeometryFactory GF = new GeometryFactory();
-    private HashMap<Long, Point> point_storage = new HashMap<>();
+    public HashMap<Long, Point> point_storage = new HashMap<>();
 
 
 
@@ -104,16 +104,20 @@ public class Tentacles implements Question {
             e.printStackTrace(pw);
             String s = sw.toString();
         }
+        circle = create_circle();
+        clear_unnecessary_points();
     }
 
 
 
 
 
-    private void clear_unnesessary_points (Polygon polygon) {
+    private void clear_unnecessary_points() {
         HashMap<Long, Point> new_point_storage = new HashMap<>();
+        com.mapbox.geojson.Point center = com.mapbox.geojson.Point.fromLngLat(lon, lat);
         for (Long ID : point_storage.keySet()) {
-            if (polygon.covers(point_storage.get(ID))) {
+            com.mapbox.geojson.Point pnt = com.mapbox.geojson.Point.fromLngLat(point_storage.get(ID).getX(), point_storage.get(ID).getY());
+            if (com.mapbox.turf.TurfMeasurement.distance(center, pnt, com.mapbox.turf.TurfConstants.UNIT_KILOMETERS) <= radius) {
                 new_point_storage.putIfAbsent(ID, point_storage.get(ID));
             }
         }
@@ -145,10 +149,6 @@ public class Tentacles implements Question {
 
     @Override
     public void create_areas() {
-        // создать круг и вычистить ненужные точки
-        Polygon circle = create_circle();
-        clear_unnesessary_points(circle);
-
         // создаём полигоны
         Point[] pts = point_storage.values().toArray(new Point[point_storage.values().size()]);
         Envelope bbox = circle.getEnvelopeInternal();
