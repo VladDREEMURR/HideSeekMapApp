@@ -15,6 +15,12 @@
     <color name="question_areas_border">#FF7D5E00</color>
     <color name="question_areas_background">#30FFEB36</color>
 
+    <color name="question_areas_border_colder">#FF2F3A8E</color>
+    <color name="question_areas_background_colder">#3003A9F4</color>
+
+    <color name="question_areas_border_hotter">#FF9D251E</color>
+    <color name="question_areas_background_hotter">#30FD5445</color>
+
     <color name="dot_location">#FF8B00A1</color>
     <color name="dot_of_object">#FF2E00A1</color>
 </resources>

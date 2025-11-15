@@ -23,7 +23,7 @@ public class PolygonBool {
     public org.locationtech.jts.geom.Polygon[] polygons;
 
     // для процесса операций
-    private Epsilon eps = epsilon(1e-12);
+    private Epsilon eps = epsilon(1e-10);
 
 
 

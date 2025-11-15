@@ -1,5 +1,6 @@
 package com.example.hideseekmapapp
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 
@@ -128,16 +129,16 @@ class MainActivity : ComponentActivity() {
             add_point_to_map(point, ContextCompat.getColor(this@MainActivity, R.color.dot_of_object))
         }
 
-         */
+        */
 
         // some code
-        val start_x = 37.542
-        val start_y = 55.745
+        val start_x = 37.618
+        val start_y = 55.756
         val end_x = 37.604
         val end_y = 55.745
         val start_point = GF.createPoint(org.locationtech.jts.geom.Coordinate(start_x, start_y))
         val end_point = GF.createPoint(org.locationtech.jts.geom.Coordinate(end_x, end_y))
-//        add_point_to_map(start_point, ContextCompat.getColor(this@MainActivity, R.color.dot_location))
+        add_point_to_map(start_point, ContextCompat.getColor(this@MainActivity, R.color.dot_location))
         draw_remaining_area()
 
         try {
@@ -800,7 +801,6 @@ class MainActivity : ComponentActivity() {
     // создание и отображение объектов
     private fun create_show_objects(question_type: QuestionType?, list_id: Int) {
         if (question_type == null) {throw Exception("create_show_objects() : No question type")}
-        // TODO: протестировать
         var question : Question? = null
         val tablet = question_tablet_list[int_to_string_id(list_id)]
         when (question_type) {
@@ -837,20 +837,6 @@ class MainActivity : ComponentActivity() {
                 add_point_to_map(point, ContextCompat.getColor(this@MainActivity, R.color.dot_location))
                 true
             }
-            /*
-            QuestionType.RADAR -> {
-                val tablet = question_tablet_list[int_to_string_id(list_id)]
-                val point = str_to_point(tablet?.findViewById<EditText>(R.id.seeker_point)?.text.toString())
-                val distance = str_to_double(tablet?.findViewById<EditText>(R.id.distance)?.text.toString())
-                question = Radar(
-                    point.x,
-                    point.y,
-                    distance
-                )
-                add_point_to_map(point, ContextCompat.getColor(this@MainActivity, R.color.dot_location))
-                true
-            }
-            */
             QuestionType.TENTACLES -> {
                 val eng_type_str = ObjectTypeTranslator.russian_to_str((tablet?.findViewById<Spinner>(R.id.object_type)?.selectedItem) as String)
                 val point = str_to_point(tablet.findViewById<EditText>(R.id.seeker_point).text.toString())
@@ -869,23 +855,6 @@ class MainActivity : ComponentActivity() {
                 add_point_to_map(point, ContextCompat.getColor(this@MainActivity, R.color.dot_location))
                 true
             }
-            /*
-            QuestionType.THERMOMETER -> {
-                val tablet = question_tablet_list[int_to_string_id(list_id)]
-                val point_colder = str_to_point(tablet?.findViewById<EditText>(R.id.point_colder)?.text.toString())
-                val point_hotter = str_to_point(tablet?.findViewById<EditText>(R.id.point_hotter)?.text.toString())
-                question = Thermometer(
-                    global_area,
-                    point_colder.x,
-                    point_colder.y,
-                    point_hotter.x,
-                    point_hotter.y
-                )
-                add_point_to_map(point_colder, ContextCompat.getColor(this@MainActivity, R.color.dot_of_object))
-                add_point_to_map(point_hotter, ContextCompat.getColor(this@MainActivity, R.color.dot_of_object))
-                true
-            }
-            */
             else -> false
         }
         if (question != null && tablet != null) {
@@ -900,23 +869,123 @@ class MainActivity : ComponentActivity() {
     // создание и отображение областей
     private fun create_show_areas(question_type: QuestionType?, list_id: Int) {
         if (question_type == null) {throw Exception("create_show_areas() : No question type")}
+        val str_id = int_to_string_id(list_id)
+        val tablet = question_tablet_list[str_id]
+        val color_border = ContextCompat.getColor(this@MainActivity, R.color.question_areas_border)
+        val color_background = ContextCompat.getColor(this@MainActivity, R.color.question_areas_background)
         // TODO: сделать создание и отображение объектов
-        when (question_type) {
-            QuestionType.MATCHING -> {
-                true
+        if (tablet != null) {
+            when (question_type) {
+                QuestionType.MATCHING -> {
+                    // создать области и сгенерировать ответ
+                    val question = question_object_list[str_id] as Matching
+                    val point = str_to_point(tablet.findViewById<EditText>(R.id.seeker_point)?.text.toString())
+                    question.create_areas()
+                    question.generate_answer(point.x, point.y)
+                    // вставить id и имя объекта
+                    val ID = question.id_of_interest
+                    val name_field = tablet.findViewById<TextView>(R.id.object_name)
+                    name_field?.text = question.names[ID]
+                    val id_field = tablet.findViewById<EditText>(R.id.object_id)
+                    id_field?.text?.clear()
+                    id_field?.text?.append(question.id_of_interest.toString())
+                    // отобразить области
+                    for (area in question.variants.values) {
+                        add_multipolygon_to_map(area, color_border, color_background)
+                    }
+                    true
+                }
+
+                QuestionType.MEASURING -> {
+                    // создать области и сгенерировать ответ
+                    val question = question_object_list[str_id] as Measuring
+                    val point = str_to_point(tablet.findViewById<EditText>(R.id.seeker_point)?.text.toString())
+                    question.create_areas()
+                    question.generate_answer(point.x, point.y)
+                    // вставить дистанцию
+                    val dist_field = tablet.findViewById<EditText>(R.id.distance)
+                    dist_field?.text?.clear()
+                    dist_field?.text?.append(question.rad.toString())
+                    // отобразить области
+                    add_multipolygon_to_map(question.area, color_border, color_background)
+                    true
+                }
+
+                QuestionType.RADAR -> {
+                    // создать области
+                    val point = str_to_point(tablet.findViewById<EditText>(R.id.seeker_point)?.text.toString())
+                    val distance = str_to_double(tablet.findViewById<EditText>(R.id.distance)?.text.toString())
+                    val question = Radar(
+                        point.x,
+                        point.y,
+                        distance
+                    )
+                    add_point_to_map(
+                        point,
+                        ContextCompat.getColor(this@MainActivity, R.color.dot_location)
+                    )
+                    question.create_areas()
+                    // отобразить область
+                    add_polygon_to_map(question.area, color_border, color_background)
+                    // добавить в список вопросов
+                    question_object_list[str_id] = question
+                    true
+                }
+
+                QuestionType.TENTACLES -> {
+                    // создать области
+                    val question = question_object_list[str_id] as Tentacles
+                    question.create_areas()
+                    // отобразить области
+                    for (area in question.variants.values) {
+                        add_multipolygon_to_map(area, color_border, color_background)
+                    }
+                    true
+                }
+
+                QuestionType.THERMOMETER -> {
+                    // создать области
+                    val point_colder = str_to_point(tablet.findViewById<EditText>(R.id.point_colder)?.text.toString())
+                    val point_hotter = str_to_point(tablet.findViewById<EditText>(R.id.point_hotter)?.text.toString())
+                    val question = Thermometer(
+                        remaining_area,
+                        point_colder.x,
+                        point_colder.y,
+                        point_hotter.x,
+                        point_hotter.y
+                    )
+                    question.create_areas()
+                    // отобразить области и точки
+                    add_point_to_map(point_colder, ContextCompat.getColor(this@MainActivity, R.color.question_areas_border_colder))
+                    add_point_to_map(point_hotter, ContextCompat.getColor(this@MainActivity, R.color.question_areas_border_hotter))
+                    add_polygon_to_map(
+                        question.colder_area,
+                        ContextCompat.getColor(
+                            this@MainActivity,
+                            R.color.question_areas_border_colder
+                        ),
+                        ContextCompat.getColor(
+                            this@MainActivity,
+                            R.color.question_areas_background_colder
+                        )
+                    )
+                    add_polygon_to_map(
+                        question.hotter_area,
+                        ContextCompat.getColor(
+                            this@MainActivity,
+                            R.color.question_areas_border_hotter
+                        ),
+                        ContextCompat.getColor(
+                            this@MainActivity,
+                            R.color.question_areas_background_hotter
+                        )
+                    )
+                    // добавить в список вопросов
+                    question_object_list[str_id] = question
+                    true
+                }
             }
-            QuestionType.MEASURING -> {
-                true
-            }
-            QuestionType.RADAR -> {
-                true
-            }
-            QuestionType.TENTACLES -> {
-                true
-            }
-            QuestionType.THERMOMETER -> {
-                true
-            }
+            renew_buttons_enability(tablet)
         }
     }
 
